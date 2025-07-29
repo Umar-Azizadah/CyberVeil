@@ -21,7 +21,7 @@ namespace CyberVeil.Player
         [SerializeField] private float dashVol = 0.5f;
 
         [Header("Visuals")]
-        public ParticleSystem dashParticles;
+        
         public Camera mainCam;
         [SerializeField] private float dashFOV = 75f; // Temporary FOV boost for dramatic dash fee
         [SerializeField] private float fovLerpSpeed = 5f; // How fast the FOV returns back to normal
@@ -68,11 +68,8 @@ namespace CyberVeil.Player
             SoundManager.PlaySound(SoundType.DASH, dashVol);
 
             // Visuals
-            if (dashParticles != null)
-            {
-                dashParticles.transform.position = transform.position;
-                dashParticles.Play();
-            }
+            
+            ParticleManager.Instance.PlayEffect(VFXType.Teleport, transform.position, Quaternion.identity);
             if (mainCam != null) mainCam.fieldOfView = dashFOV;
             StartCoroutine(dissolveHandler.DissolveOut(dissolveHandler.dissolveDashMaterial, dissolveDuration));
 

@@ -2,16 +2,12 @@ using System.Collections;
 using UnityEngine;
 using CyberVeil.Combat;
 using CyberVeil.Systems;
+using CyberVeil.VFX;
 
 namespace CyberVeil.Player
 {
     public class SlashAttack : MonoBehaviour
     {
-        //reference to the particle system
-        public ParticleSystem slashParticleSystem;
-        public ParticleSystem slashParticleSystem2;
-        public ParticleSystem slashHit;
-        public ParticleSystem slashHit2;
 
         //stores player transform
         public Transform playerTransform;
@@ -38,11 +34,7 @@ namespace CyberVeil.Player
             transform.position = slashPosition;
             transform.rotation = slashRotation;
 
-            slashParticleSystem.transform.localPosition = Vector3.zero;
-            slashParticleSystem.transform.localRotation = Quaternion.identity;
-
-            slashParticleSystem.Play();
-            slashParticleSystem2.Play();
+            ParticleManager.Instance.PlayEffect(VFXType.Slash1, slashPosition, slashRotation);
             StartCoroutine(toggleCollider());
         }
 
@@ -51,27 +43,16 @@ namespace CyberVeil.Player
         {
             if (other.CompareTag("Enemy"))
             {
-                Debug.Log("Enemy hit by slash!");
+                // Position above enemy (slightly raised for visibility)
+                Vector3 hitPos = other.transform.position + Vector3.up * 1f;
 
-                //play hit particles
-                if (slashHit != null && slashHit2 != null)
-                {
-                    slashHit.transform.position = other.transform.position;
-                    slashHit2.transform.position = other.transform.position;
-                    slashHit.Play();
-                    slashHit2.Play();
-                }
+                // Play pooled hit effects, now facing outward
+                ParticleManager.Instance.PlayEffect(VFXType.SlashHit, hitPos, Quaternion.identity);
+                ParticleManager.Instance.PlayEffect(VFXType.SlashImpact, hitPos, Quaternion.identity);
 
                 //apply hit stop
                 HitstopManager.Instance.DoHitstop(0.005f, 0f); //adjust duration & freeze level
 
-                // Deal damage
-                IDamagable damagable = other.GetComponent<IDamagable>();
-                damagable?.TakeDamage(25);
-
-                // deal knockback
-                IKnockbackable knockback = other.GetComponent<IKnockbackable>();
-                knockback?.ApplyKnockback(playerTransform);
 
             }
         }

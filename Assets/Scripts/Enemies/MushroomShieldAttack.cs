@@ -21,6 +21,10 @@ namespace CyberVeil.Enemies
             // Smooth lunge forward
             yield return MoveShield(shieldTransform, original, lunge, lungeDuration);
 
+            Vector3 worldPos = shieldTransform.position; // small Y offset to make it visible
+            ParticleManager.Instance.PlayEffect(VFXType.MushroomShieldParticle, worldPos, shieldTransform.rotation);
+
+
             // Short pause to emphasize impact
             yield return new WaitForSeconds(returnDelay);
 

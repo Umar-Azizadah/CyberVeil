@@ -2,17 +2,13 @@ using UnityEngine;
 using System.Collections;
 using CyberVeil.Combat;
 using CyberVeil.Systems;
+using CyberVeil.VFX;
 
 
 namespace CyberVeil.Player
 {
     public class SlashAttack2 : MonoBehaviour
     {
-        //reference to the particle system
-        public ParticleSystem slashParticleSystem;
-        public ParticleSystem slashParticleSystem2;
-        public ParticleSystem slashHit;
-        public ParticleSystem slashHit2;
         //stores player transform
         public Transform playerTransform;
         public Vector3 offset = new Vector3(0.5f, 0.5f, 10f);
@@ -34,18 +30,19 @@ namespace CyberVeil.Player
         }
         public void PlaySlash(Vector3 forwardDir)
         {
+            // Position in front of player + offset
             Vector3 slashPosition = playerTransform.position + forwardDir * 1.2f + offset;
-            Quaternion slashRotation = playerTransform.rotation;
+            // Base rotation facing forward
+            Quaternion baseRotation = playerTransform.rotation;
 
-            transform.position = slashPosition;
-            transform.rotation = slashRotation;
-            transform.Rotate(xRotate, yRotate, zRotate); // apply rotation offsets
+            // Extra rotation (applied as a rotation offset)
+            Quaternion customOffset = Quaternion.Euler(xRotate, yRotate, zRotate);
 
-            slashParticleSystem.transform.localPosition = Vector3.zero;
-            slashParticleSystem.transform.localRotation = Quaternion.identity;
+            Quaternion finalRotation = baseRotation * customOffset;
 
-            slashParticleSystem.Play();
-            slashParticleSystem2.Play();
+            // Sets slash effect position and rotation via ParticleManager
+            ParticleManager.Instance.PlayEffect(VFXType.Slash2, slashPosition, finalRotation);
+            ParticleManager.Instance.PlayEffect(VFXType.Slash2, slashPosition, finalRotation);
             StartCoroutine(toggleCollider());
         }
 
@@ -54,23 +51,15 @@ namespace CyberVeil.Player
         {
             if (other.CompareTag("Enemy"))
             {
-                Debug.Log("Enemy hit by slash!");
+                Debug.Log("MEOW2");
+                // Position above enemy (slightly raised for visibility)
+                Vector3 hitPos = other.transform.position + Vector3.up * 1f;
 
-                // Play hit particles
-                if (slashHit != null && slashHit2 != null)
-                {
-                    slashHit.transform.position = other.transform.position;
-                    slashHit2.transform.position = other.transform.position;
-                    slashHit.Play();
-                    slashHit2.Play();
-                }
-
+                // Play pooled hit effects, now facing outward
+                ParticleManager.Instance.PlayEffect(VFXType.SlashHit, hitPos, Quaternion.identity);
+                ParticleManager.Instance.PlayEffect(VFXType.SlashImpact, hitPos, Quaternion.identity);
                 // Apply hit pause
                 HitstopManager.Instance.DoHitstop(0.01f, 0f); //adjust duration & freeze level
-
-                // Deal damage
-                IDamagable damagable = other.GetComponent<IDamagable>();
-                damagable?.TakeDamage(25);
 
             }
         }

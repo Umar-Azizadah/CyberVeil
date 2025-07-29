@@ -31,6 +31,11 @@ namespace CyberVeil.Player
         public toggleAxe toggleAxe;
         public toggleAxe2 toggleAxe2;
 
+        [Header("Slash References")]
+        public SlashAttack slash1;
+        public SlashAttack2 slash2;
+        public SlashAttack3 slash3;
+
         private PlayerController playerController;
         private CharacterStateMachine stateMachine;
 
@@ -69,11 +74,17 @@ namespace CyberVeil.Player
             stateMachine.ChangeState(CharacterState.Attacking);
             Invoke(nameof(EndAttack), attackDuration);
 
-            // Apply combat damage using CombatManager
             CombatManager.Instance.DealDamageInRadius(transform.position, attackRange, attackDamage, gameObject);
 
             // Trigger slash effect using centralized ParticleManager
-            ParticleManager.Instance.PlaySlash(attackComboCount, transform.position, playerController.GetLastDirection());
+            Vector3 attackDirection = playerController.GetLastDirection();
+
+            if (attackComboCount == 0)
+                slash1.PlaySlash(attackDirection);
+            else if (attackComboCount == 1)
+                slash2.PlaySlash(attackDirection);
+            else if (attackComboCount == 2)
+                slash3.PlaySlash(attackDirection);
         }
 
         private void EndAttack()
