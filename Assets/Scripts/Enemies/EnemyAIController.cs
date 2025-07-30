@@ -25,6 +25,7 @@ namespace CyberVeil.Enemies
         private CharacterStateMachine characterStateMachine;
         private EnemyPatrol patrolBehavior;
         private EnemyChase chaseBehavior;
+        private EnemyDamaged damagedBehavior;
         private Transform player;
         public EnemyAIState currentAIState = EnemyAIState.Idle;
 
@@ -33,6 +34,7 @@ namespace CyberVeil.Enemies
             characterStateMachine = GetComponent<CharacterStateMachine>();
             patrolBehavior = GetComponent<EnemyPatrol>();
             chaseBehavior = GetComponent<EnemyChase>();
+            damagedBehavior = GetComponent<EnemyDamaged>();
             player = GameObject.FindGameObjectWithTag("Player")?.transform;
         }
 
@@ -40,7 +42,7 @@ namespace CyberVeil.Enemies
         {
             float distance = Vector3.Distance(transform.position, player.position);
 
-            switch(currentAIState)
+            switch (currentAIState)
             {
                 case EnemyAIState.Idle:
                     // Start patrolling if patrol exists
@@ -68,11 +70,13 @@ namespace CyberVeil.Enemies
                     break;
 
                 case EnemyAIState.Attack:
-                    // Limit attacks using cooldown timer
                     if (Time.time - lastAttackTime > attackCooldown)
                     {
                         lastAttackTime = Time.time;
-                        StartCoroutine(HandleAttack());
+                        StartCoroutine(HandleAttack(() =>
+                        {
+                            ChangeAIState(EnemyAIState.Wait);
+                        }));
                     }
                     break;
 
@@ -82,14 +86,27 @@ namespace CyberVeil.Enemies
                     if (distance > attackRange + 1.5f)
                         ChangeAIState(EnemyAIState.Chase);
                     break;
+
+                case EnemyAIState.Damaged:
+                    characterStateMachine.ChangeState(CharacterState.Damaged);
+
+                    if (!damagedBehavior.isStaggered)
+                    {
+                        // Triggers the damage coroutine, when its done changes state to chase
+                        damagedBehavior.TriggerDamage(() =>
+                        {
+                            ChangeAIState(EnemyAIState.Chase); // return to Chase after damage done
+                        });
+                    }
+                    break;
             }
         }
 
         /// <summary>
-        /// Coroutine to handle enemy attack logic
-        /// Triggers attack animation, then transitions to Wait state
+        /// Triggers the enemy's attack behavior and waits for it to finish
+        /// Then runs a callback Action
         /// </summary>
-        private IEnumerator HandleAttack()
+        private IEnumerator HandleAttack(System.Action onAttackComplete)
         {
             characterStateMachine.ChangeState(CharacterState.Attacking);
 
@@ -99,7 +116,7 @@ namespace CyberVeil.Enemies
                 yield return StartCoroutine(attack.ExecuteAttack());
             }
 
-            ChangeAIState(EnemyAIState.Wait);
+            onAttackComplete?.Invoke();
         }
 
         /// <summary>
