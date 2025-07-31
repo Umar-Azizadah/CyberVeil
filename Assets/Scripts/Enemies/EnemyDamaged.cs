@@ -6,7 +6,7 @@ namespace CyberVeil.Enemies
 {
     [RequireComponent(typeof(EnemyAIController))]
     /// <summary>
-    /// Handles the enemy's staggered/damaged state behavior
+    /// Handles the enemy's damaged state behavior, manages stagger timing and delegates post-damage control
     /// Locks the enemy in a stunned state for a set duration then calls a callback (onComplete) to return to normal behavior
     /// </summary>
     public class EnemyDamaged : MonoBehaviour
@@ -34,7 +34,7 @@ namespace CyberVeil.Enemies
             staggerRoutine = StartCoroutine(HandleDamage(onComplete));
         }
 
-        // Manages timed stagger behavior 
+        // Executes timed lockout behavior, then triggers externally defined recovery logic
         private IEnumerator HandleDamage(Action onComplete)
         {
             isStaggered = true;
