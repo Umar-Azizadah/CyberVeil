@@ -105,7 +105,7 @@ Material:
     m_Colors:
     - Vector3_2E106ED0: {r: 90, g: 0, b: 0, a: 0}
     - _AmbientColor: {r: 0.9245283, g: 0, b: 0, a: 0}
-    - _BaseColor: {r: 0.79622644, g: 0, b: 0, a: 1}
+    - _BaseColor: {r: 0.5471698, g: 0, b: 0, a: 1}
     - _DirectionFactor: {r: 90, g: 1.4, b: 0, a: 0}
     - _DissolveDirection: {r: 0, g: 0, b: 0, a: 0}
     - _DissolveOffest: {r: 100, g: -0.2, b: 0, a: 0}

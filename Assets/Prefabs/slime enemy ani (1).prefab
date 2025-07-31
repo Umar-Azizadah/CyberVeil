@@ -12921,6 +12921,8 @@ GameObject:
   - component: {fileID: 946910169626345073}
   - component: {fileID: -6736712735464796415}
   - component: {fileID: -8062204462726741376}
+  - component: {fileID: -537265182480694011}
+  - component: {fileID: 7455152617875814887}
   m_Layer: 0
   m_Name: slime enemy ani (1)
   m_TagString: Enemy
@@ -12963,12 +12965,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 1
-  follow: 1
   attackRange: 2.5
   detectionRange: 10
   lastAttackTime: -999
   currentAIState: 0
-  player: {fileID: 0}
 --- !u!95 &2693187546379020044
 Animator:
   serializedVersion: 7
@@ -13174,6 +13174,7 @@ MonoBehaviour:
   patrolPoints: []
   patrolSpeed: 0.8
   reachThreshold: 0.3
+  waiting: 0
 --- !u!114 &-8062204462726741376
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13188,6 +13189,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chaseSpeed: 1.2
   rotationSpeed: 8
+--- !u!114 &-537265182480694011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7569483539447259062}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6f3d1f6eebdbb24f978fa4b5d8dc480, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7455152617875814887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7569483539447259062}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 821133350b1ecb845a327af1084e6374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damagedDuration: 1
+  isStaggered: 0
 --- !u!1 &7818790826083011024
 GameObject:
   m_ObjectHideFlags: 0
