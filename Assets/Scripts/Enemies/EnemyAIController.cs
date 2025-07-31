@@ -20,6 +20,8 @@ namespace CyberVeil.Enemies
 
         private float attackCooldown = 1.5f;
         public float lastAttackTime = -999f;
+        private float waitStartTime = -1f;
+        private float waitDuration = 0.7f;
 
         [Header("Refereneces")]
         private CharacterStateMachine characterStateMachine;
@@ -70,6 +72,13 @@ namespace CyberVeil.Enemies
                     break;
 
                 case EnemyAIState.Attack:
+                    // Cancel attack if player is too far (in case they moved)
+                    if (distance > attackRange)
+                    {
+                        ChangeAIState(EnemyAIState.Chase);
+                        break;
+                    }
+                    // Limit attacks using cooldown timer
                     if (Time.time - lastAttackTime > attackCooldown)
                     {
                         lastAttackTime = Time.time;
@@ -85,6 +94,9 @@ namespace CyberVeil.Enemies
                     // Resume chase if player has moved out of attack range
                     if (distance > attackRange + 1.5f)
                         ChangeAIState(EnemyAIState.Chase);
+                    // After waitDuration, try attacking again
+                    else if (Time.time - waitStartTime > waitDuration)
+                        ChangeAIState(EnemyAIState.Attack);
                     break;
 
                 case EnemyAIState.Damaged:
