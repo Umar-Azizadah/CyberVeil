@@ -16,7 +16,6 @@ namespace CyberVeil.Enemies
         public float speed = 1f;
 
         [Header("Ranges")]
-        public float attackRange = 2f;
         public float detectionRange = 4f;
 
         private float attackCooldown = 1.5f;
