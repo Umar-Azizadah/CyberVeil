@@ -4,9 +4,11 @@ using System.Collections.Generic;
 namespace CyberVeil.Enemies
 {
     /// <summary>
+    /// Enables enemies to support multiple attack types by handling selection logic
     /// Selects and manages enemy attacks based on distance and cooldown
-    /// Centralizes cooldown tracking for ScriptableObject-based attacks
-    /// to enable reuse and decouple prefab lifecycle from timing logic
+    /// Tracks cooldowns externally to ensure attack timing is consistent,
+    /// even when attacks are defined as reusable prefabs via ScriptableObjects
+
     /// </summary>
     public class EnemyAttackSelector : MonoBehaviour
     {
