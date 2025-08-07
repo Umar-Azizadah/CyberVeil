@@ -38,7 +38,7 @@ namespace CyberVeil.Enemies
             }
 
             // Applies damage to player
-            CombatManager.Instance.DealDamageInRadius(transform.position, attackRadius, damageAmount, gameObject);
+            CombatManager.Instance.DealDamageInRadius(transform.position, attackRadius, damageAmount, transform.root.gameObject);
         }
     }
 }

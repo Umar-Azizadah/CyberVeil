@@ -12923,6 +12923,7 @@ GameObject:
   - component: {fileID: -8062204462726741376}
   - component: {fileID: -537265182480694011}
   - component: {fileID: 7455152617875814887}
+  - component: {fileID: 6450212238556313273}
   m_Layer: 0
   m_Name: slime enemy ani (1)
   m_TagString: Enemy
@@ -13215,6 +13216,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damagedDuration: 1
   isStaggered: 0
+--- !u!114 &6450212238556313273
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7569483539447259062}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f3d4a811f4063542a1811c01f18b506, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attacks:
+  - {fileID: 11400000, guid: 37018aded77d1b1408d127487df16842, type: 2}
+  - {fileID: 11400000, guid: 2045c24aa1281954cb7019676f35ee62, type: 2}
 --- !u!1 &7818790826083011024
 GameObject:
   m_ObjectHideFlags: 0

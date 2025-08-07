@@ -17,6 +17,7 @@ namespace CyberVeil.VFX
         PlayerHitSpark,
         MushroomShieldParticle,
         Teleport,
+        SlimeSplat,
     }
 
     /// <summary>
