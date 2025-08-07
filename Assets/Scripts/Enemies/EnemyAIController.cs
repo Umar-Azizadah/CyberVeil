@@ -5,8 +5,9 @@ using System.Collections;
 namespace CyberVeil.Enemies
 {
     /// <summary>
-    /// AI state controller for enemy behavior
-    /// Central brain that monitors player distance and updates EnemyAIState
+    /// AI state controller (central brain) for enemy behavior, 
+    /// controls high-level enemy AI behavior by managing movement, targeting, and state transitions
+    /// Supports a modular, multi attack system via the EnemyAttackSelector component and ScriptableObject based attack data
     /// Delegates movement and animation control through CharacterStateMachine
     /// </summary>
     public class EnemyAIController : MonoBehaviour
@@ -23,23 +24,35 @@ namespace CyberVeil.Enemies
         private float waitStartTime = -1f;
         private float waitDuration = 0.7f;
 
-        [Header("Refereneces")]
+        [Header("References")]
         private CharacterStateMachine characterStateMachine;
         private EnemyPatrol patrolBehavior;
         private EnemyChase chaseBehavior;
         private EnemyDamaged damagedBehavior;
         private Transform player;
         public EnemyAIState currentAIState = EnemyAIState.Idle;
+        private EnemyAttackSelector attackSelector;
+        private EnemyAttackData currentAttack;
 
+        /// <summary>
+        /// Caches all required references and components at runtime
+        /// </summary>
         private void Start()
         {
             characterStateMachine = GetComponent<CharacterStateMachine>();
             patrolBehavior = GetComponent<EnemyPatrol>();
             chaseBehavior = GetComponent<EnemyChase>();
             damagedBehavior = GetComponent<EnemyDamaged>();
+            attackSelector = GetComponent<EnemyAttackSelector>();
+
             player = GameObject.FindGameObjectWithTag("Player")?.transform;
         }
 
+        /// <summary>
+        /// Main decision making loop for AI behavior
+        /// Transitions states based on player distance and internal timers
+        /// Integrated with attack selection logic
+        /// </summary>
         void Update()
         {
             float distance = Vector3.Distance(transform.position, player.position);
@@ -47,7 +60,8 @@ namespace CyberVeil.Enemies
             switch (currentAIState)
             {
                 case EnemyAIState.Idle:
-                    // Start patrolling if patrol exists
+                    // If patrol exists, begin patrolling
+                    // Otherwise, enter chase state if player is within detection range
                     if (patrolBehavior != null)
                         ChangeAIState(EnemyAIState.Patrol);
                     else if (distance < detectionRange)
@@ -65,43 +79,40 @@ namespace CyberVeil.Enemies
                     break;
 
                 case EnemyAIState.Chase:
+                    // Actively pursue the player while in detection range
+                    // If an attack is available based on range and cooldown, transition to attack
                     characterStateMachine.ChangeState(CharacterState.Moving);
-                    // Enter Attack if within striking distance
-                    if (distance <= attackRange)
+                    if (attackSelector.HasAttackReady())
                         ChangeAIState(EnemyAIState.Attack);
                     break;
 
                 case EnemyAIState.Attack:
-                    // Cancel attack if player is too far (in case they moved)
-                    if (distance > attackRange)
-                    {
-                        ChangeAIState(EnemyAIState.Chase);
-                        break;
-                    }
-                    // Limit attacks using cooldown timer
+                    // Executes the selected attack if cooldown has elapsed
+                    // The AttackSelector chooses the most appropriate attack (range + cooldown)
                     if (Time.time - lastAttackTime > attackCooldown)
                     {
                         lastAttackTime = Time.time;
-                        StartCoroutine(HandleAttack(() =>
-                        {
-                            ChangeAIState(EnemyAIState.Wait);
-                        }));
+                        currentAttack = attackSelector.GetSelectedAttack();
+                        // Begins the attack and transitions to Wait once it completes (prevents spam attack)
+                        StartCoroutine(HandleAttack(() => ChangeAIState(EnemyAIState.Wait)));
                     }
                     break;
 
                 case EnemyAIState.Wait:
                     characterStateMachine.ChangeState(CharacterState.Idle);
-                    // Resume chase if player has moved out of attack range
-                    if (distance > attackRange + 1.5f)
+                    // Brief delay after an attack before evaluating next action
+                    // Returns to Chase if player has moved away
+                    // Otherwise, rechecks cooldown availability before attacking again
+                    if (distance > 1.5f)
                         ChangeAIState(EnemyAIState.Chase);
-                    // After waitDuration, try attacking again
-                    else if (Time.time - waitStartTime > waitDuration)
+                    else if (Time.time - waitStartTime > waitDuration && attackSelector.HasAttackReady())
                         ChangeAIState(EnemyAIState.Attack);
                     break;
 
                 case EnemyAIState.Damaged:
+                    // Enemy is temporarily staggered from taking damage
+                    // Once stagger ends, resume chasing the player
                     characterStateMachine.ChangeState(CharacterState.Damaged);
-
                     if (!damagedBehavior.isStaggered)
                     {
                         // Triggers the damage coroutine, when its done changes state to chase
@@ -115,17 +126,32 @@ namespace CyberVeil.Enemies
         }
 
         /// <summary>
-        /// Triggers the enemy's attack behavior and waits for it to finish
-        /// Then runs a callback Action
+        /// Executes the selected attack by instantiating a prefab with an IEnemyAttack implementation,
+        /// or falls back to internal logic if no prefab is assigned
         /// </summary>
         private IEnumerator HandleAttack(System.Action onAttackComplete)
         {
             characterStateMachine.ChangeState(CharacterState.Attacking);
 
-            IEnemyAttack attack = GetComponent<IEnemyAttack>();
-            if (attack != null)
+            if (currentAttack != null)
             {
-                yield return StartCoroutine(attack.ExecuteAttack());
+                if (currentAttack.attackPrefab != null)
+                {
+                    // Prefab-based attack (used by most enemies)
+                    GameObject attackInstance = Instantiate(currentAttack.attackPrefab, transform.position, Quaternion.identity, transform);
+                    IEnemyAttack attackLogic = attackInstance.GetComponent<IEnemyAttack>();
+                    if (attackLogic != null)
+                        yield return StartCoroutine(attackLogic.ExecuteAttack());
+
+                    Destroy(attackInstance);
+                }
+                else
+                {
+                    // Internal attack (used by Mushroom with EnemyBasicAttack + MushroomShieldAttack)
+                    IEnemyAttack internalAttack = GetComponent<IEnemyAttack>();
+                    if (internalAttack != null)
+                        yield return StartCoroutine(internalAttack.ExecuteAttack());
+                }
             }
 
             onAttackComplete?.Invoke();
@@ -137,7 +163,11 @@ namespace CyberVeil.Enemies
         /// </summary>
         public void ChangeAIState(EnemyAIState newState)
         {
+            if (newState == EnemyAIState.Wait)
+                waitStartTime = Time.time;
+
             currentAIState = newState;
         }
+
     }
 }
