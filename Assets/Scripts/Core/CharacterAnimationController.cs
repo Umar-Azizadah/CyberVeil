@@ -18,6 +18,7 @@ namespace CyberVeil.Core
         private static readonly int animIDSprint = Animator.StringToHash("Sprint");
         private static readonly int animIDAttack = Animator.StringToHash("Attack");
         private static readonly int animIDDamage = Animator.StringToHash("TakeDamage");
+        private static readonly int animIDStrafe = Animator.StringToHash("Strafe");
 
         private void Start()
         {
@@ -53,6 +54,9 @@ namespace CyberVeil.Core
                     break;
                 case CharacterState.Damaged:
                     animator.CrossFade(animIDDamage, 0.1f, 0);
+                    break;
+                case CharacterState.Strafing:
+                    animator.CrossFade(animIDStrafe, 0.1f, 0);
                     break;
             }
         }

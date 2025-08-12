@@ -4,7 +4,7 @@ using UnityEngine;
 namespace CyberVeil.Core
 {
     // Using enum to force strict state logic and prevent logic bugs (compared to using strings or ints)
-    public enum CharacterState { Idle, Moving, Attacking, Dashing, Damaged, Sprinting }
+    public enum CharacterState { Idle, Moving, Attacking, Dashing, Damaged, Sprinting, Strafing}
 
     /// <summary>
     /// Controls and tracks the player's current state using a finite state machine 

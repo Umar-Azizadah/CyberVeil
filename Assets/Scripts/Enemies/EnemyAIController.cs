@@ -83,7 +83,31 @@ namespace CyberVeil.Enemies
                     characterStateMachine.ChangeState(CharacterState.Moving);
                     if (attackSelector.HasAttackReady())
                         ChangeAIState(EnemyAIState.Attack);
+                    if (Random.value < 0.03f) // 10% chance to strafe instead of chase or attack
+                    {
+                        waitStartTime = Time.time;
+                        ChangeAIState(EnemyAIState.Strafe);
+                    }
+
                     break;
+
+                case EnemyAIState.Strafe:
+                    characterStateMachine.ChangeState(CharacterState.Strafing);
+
+                    // Picks a strafe direction (sideways or back)
+                    Vector3 toPlayer = (player.position - transform.position).normalized;
+                    Vector3 strafeDir = Vector3.Cross(Vector3.up, toPlayer); // Left/right
+
+                    transform.position += strafeDir * 0.5f * Time.deltaTime;
+
+                    // Facee player while strafing
+                    transform.rotation = Quaternion.LookRotation(toPlayer);
+
+                    // Exit after short duration
+                    if (Time.time - waitStartTime > 1.2f)
+                        ChangeAIState(EnemyAIState.Chase);
+                    break;
+
 
                 case EnemyAIState.Attack:
                     // Executes the selected attack if cooldown has elapsed
@@ -95,6 +119,12 @@ namespace CyberVeil.Enemies
                         // Begins the attack and transitions to Wait once it completes (prevents spam attack)
                         StartCoroutine(HandleAttack(() => ChangeAIState(EnemyAIState.Wait)));
                     }
+                    if (Random.value < 0.03f) // 10% chance to strafe instead of attack
+                    {
+                        waitStartTime = Time.time;
+                        ChangeAIState(EnemyAIState.Strafe);
+                    }
+
                     break;
 
                 case EnemyAIState.Wait:
