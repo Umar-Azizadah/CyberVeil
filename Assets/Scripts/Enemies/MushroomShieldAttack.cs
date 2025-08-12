@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections;
 using CyberVeil.VFX;
+using CyberVeil.Systems;
+
 namespace CyberVeil.Enemies
 {
     /// <summary>
@@ -12,6 +14,7 @@ namespace CyberVeil.Enemies
         [SerializeField] private Transform shieldTransform;
         [SerializeField] private float lungeDuration = 0.15f;
         [SerializeField] private float returnDelay = 0.05f;
+        [SerializeField] private float shieldAttkVol = 0.45f;
 
         public IEnumerator PerformEffect(float delay)
         {
@@ -20,6 +23,7 @@ namespace CyberVeil.Enemies
 
             // Smooth lunge forward
             yield return MoveShield(shieldTransform, original, lunge, lungeDuration);
+            SoundManager.PlaySound(SoundType.SHIELDATTK, shieldAttkVol);
 
             Vector3 worldPos = shieldTransform.position; // small Y offset to make it visible
             ParticleManager.Instance.PlayEffect(VFXType.MushroomShieldParticle, worldPos, shieldTransform.rotation);

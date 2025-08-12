@@ -16,7 +16,8 @@ namespace CyberVeil.Systems
         ENEMYDAMAGE,
         SLIMESPLAT,
         SLIMEJUMP,
-        DASH
+        DASH,
+        SHIELDATTK,
     }
 
     // Ensures an audio source is on the game object and lets the script run in the editor
@@ -44,8 +45,6 @@ namespace CyberVeil.Systems
 
         private void Awake()
         {
-            
-
             instance = this;
 
             sfxAudioSource = gameObject.AddComponent<AudioSource>();
@@ -138,7 +137,7 @@ namespace CyberVeil.Systems
 
     [Serializable]
     // Defines the soundlist struct
-    public struct SoundList
+    public class SoundList
     {
         public AudioClip[] Sounds { get => sounds; } // Read only access to the sound array 
         [HideInInspector] public string name; // Hides the internal category label 
