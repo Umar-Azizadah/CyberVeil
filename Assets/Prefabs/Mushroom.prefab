@@ -5177,9 +5177,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a92ed4669e4b6174185dccf5d2c375ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 1.8
-  attackRange: 2.2
-  detectionRange: 10
+  speed: 1
+  detectionRange: 8
   lastAttackTime: -999
   currentAIState: 0
 --- !u!95 &2749255761449696861
@@ -5300,7 +5299,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   faction: 1
-  maxHealth: 150
+  maxHealth: 260
   currentHealth: 0
 --- !u!114 &5921025101564834622
 MonoBehaviour:
@@ -5400,7 +5399,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fba49c3cd6381c14a8510bd18009aa7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chaseSpeed: 1.8
+  chaseSpeed: 2.4
   rotationSpeed: 8
 --- !u!114 &-8146182138653953188
 MonoBehaviour:
@@ -5432,6 +5431,7 @@ MonoBehaviour:
   shieldTransform: {fileID: 340908491609399489}
   lungeDuration: 0.15
   returnDelay: 0.05
+  shieldAttkVol: 0.4
 --- !u!114 &3712970511574763721
 MonoBehaviour:
   m_ObjectHideFlags: 0

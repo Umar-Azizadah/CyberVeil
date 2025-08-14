@@ -12966,8 +12966,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 1
-  attackRange: 2.5
-  detectionRange: 10
+  detectionRange: 9
   lastAttackTime: -999
   currentAIState: 0
 --- !u!95 &2693187546379020044
@@ -13088,7 +13087,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   faction: 1
-  maxHealth: 100
+  maxHealth: 160
   currentHealth: 0
 --- !u!114 &-3731331388470417453
 MonoBehaviour:
