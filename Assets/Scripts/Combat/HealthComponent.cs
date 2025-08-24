@@ -2,12 +2,13 @@ using CyberVeil.Audio;
 using CyberVeil.Core;
 using CyberVeil.VFX;
 using UnityEngine;
+using System;
 
 namespace CyberVeil.Combat
 {
     /// <summary>
     /// Handles health management for any damageable entity, including damage intake,
-    /// faction identity, and integration with visual/audio feedback and death logic
+    /// faction identity, UI event broadcasting and integration with visual/audio feedback and death logic
     /// </summary>
     public class HealthComponent : MonoBehaviour
     {
@@ -15,9 +16,19 @@ namespace CyberVeil.Combat
         [SerializeField] private int maxHealth = 100;
         [SerializeField] private int currentHealth;
 
-        private void Start()
+        public event Action<HealthComponent> OnHealthChanged; // Event for UI (or other systems) to suscribe to whenever health changes
+
+        // Public readonly to expose private fields
+        public float Normalized => maxHealth > 0 ? (float)currentHealth / maxHealth : 0f; // Returns health as a percentage for use in UI
+
+        private void Awake()
         {
-            currentHealth = maxHealth; // Sets health to max at start
+            currentHealth = maxHealth; // Sets health to max at start      
+        }
+
+        private void OnEnable()
+        {
+            OnHealthChanged?.Invoke(this); // Broadcast initial state so UI is correct at game start
         }
 
         /// <summary>
@@ -29,8 +40,10 @@ namespace CyberVeil.Combat
         {
             currentHealth -= damage;
 
+            OnHealthChanged?.Invoke(this); // Broadcast new health state to UI
+
             /// <summary>
-            /// Using null checks to prevent runtime crashes
+            /// Local feedback systems for effects (only cares about THIS) using null checks to prevent runtime crashes
             /// </summary>
             IDamageVisual damageVisual = GetComponent<IDamageVisual>();
             damageVisual?.PlayDamageEffect();
