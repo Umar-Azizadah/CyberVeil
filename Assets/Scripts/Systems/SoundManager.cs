@@ -18,6 +18,7 @@ namespace CyberVeil.Systems
         SLIMEJUMP,
         DASH,
         SHIELDATTK,
+        ATTACKLOCK,
     }
 
     // Ensures an audio source is on the game object and lets the script run in the editor

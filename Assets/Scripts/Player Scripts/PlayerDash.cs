@@ -62,6 +62,8 @@ namespace CyberVeil.Player
 
         private IEnumerator PerformDash()
         {
+            playerState.ChangeState(CharacterState.Dashing);
+
             // Locks out further dashing
             isDashing = true;
             canDash = false;
@@ -86,6 +88,7 @@ namespace CyberVeil.Player
             // Post dash cleanup
             StartCoroutine(dissolveHandler.DissolveIn(dissolveHandler.dissolveDashMaterial, dissolveDuration));
             isDashing = false;
+            playerState.ChangeState(CharacterState.Idle);
             StartCoroutine(DashCooldown());
         }
 

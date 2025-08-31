@@ -36,6 +36,8 @@ namespace CyberVeil.Player
         public SlashAttack2 slash2;
         public SlashAttack3 slash3;
 
+        [SerializeField] private MonoBehaviour attackGateBehaviour;
+        private IAttackGate attackGate;
         private PlayerController playerController;
         private CharacterStateMachine stateMachine;
 
@@ -43,6 +45,8 @@ namespace CyberVeil.Player
         {
             playerController = GetComponent<PlayerController>();
             stateMachine = GetComponent<CharacterStateMachine>();
+            attackGate = GetComponent<AttackLimiterMechanic>();
+            
 
             toggleAxe.HideAxe();
             toggleAxe2.HideAxe2();
@@ -50,27 +54,32 @@ namespace CyberVeil.Player
 
         public void HandleAttackInput()
         {
-            if (stateMachine.CurrentState != CharacterState.Attacking
-                && canAttack
-                && Mouse.current != null
-                && Mouse.current.leftButton.wasPressedThisFrame)
+            if (stateMachine.CurrentState == CharacterState.Attacking
+                || canAttack == false
+                || Mouse.current == null
+                || !Mouse.current.leftButton.wasPressedThisFrame)
+                return;
+
+            // Limiter check
+            if (attackGate != null && !attackGate.CanStartAttack)
             {
-                StartAttack();
-                SoundManager.PlaySound(SoundType.ATTACK, attackVolume);
-                SoundManager.PlaySound(SoundType.SLASH, slashVolume);
-
-                // Movement boost during attack
-                AttackMovementBoost();
-
-                // Axe visuals for combo count
-                UpdateAxeVisuals(attackComboCount);
-
-                HandleComboLogic();
+                SoundManager.PlaySound(SoundType.ATTACKLOCK, 0.6f); 
+                return; 
             }
+
+            // Normal attack sequence
+            StartAttack();
+            SoundManager.PlaySound(SoundType.ATTACK, attackVolume);
+            SoundManager.PlaySound(SoundType.SLASH, slashVolume);
+
+            AttackMovementBoost();
+            UpdateAxeVisuals(attackComboCount);
+            HandleComboLogic();
         }
 
         private void StartAttack()
         {
+            attackGate?.RecordAttack();
             stateMachine.ChangeState(CharacterState.Attacking);
             Invoke(nameof(EndAttack), attackDuration);
 
