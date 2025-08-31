@@ -50,4 +50,4 @@ MonoBehaviour:
   leapVol: 0.4
   splatVol: 0.6
   damageRadius: 2
-  damageAmount: 30
+  damageAmount: 25
