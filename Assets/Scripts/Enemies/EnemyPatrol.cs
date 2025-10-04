@@ -82,7 +82,7 @@ namespace CyberVeil.Enemies
                 patrolPoints[i] = new PatrolPoint
                 {
                     point = points[i],
-                    waitTime = 1.5f // Default wait time
+                    waitTime = 1f // Default wait time
                 };
             }
         }

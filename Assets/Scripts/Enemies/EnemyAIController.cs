@@ -69,7 +69,7 @@ namespace CyberVeil.Enemies
 
                 case EnemyAIState.Patrol:
                     characterStateMachine.ChangeState(CharacterState.Moving);
-                    // Idle if waiting at patrol point
+                    // Waiting if waiting at patrol point
                     if (patrolBehavior.waiting)
                         characterStateMachine.ChangeState(CharacterState.Idle);
                     // Transition to Chase if player is nearby
@@ -83,7 +83,7 @@ namespace CyberVeil.Enemies
                     characterStateMachine.ChangeState(CharacterState.Moving);
                     if (attackSelector.HasAttackReady())
                         ChangeAIState(EnemyAIState.Attack);
-                    if (Random.value < 0.03f) // 10% chance to strafe instead of chase or attack
+                    if (Random.value < 0.03f) // 3% chance to strafe instead of chase or attack
                     {
                         waitStartTime = Time.time;
                         ChangeAIState(EnemyAIState.Strafe);
@@ -119,7 +119,7 @@ namespace CyberVeil.Enemies
                         // Begins the attack and transitions to Wait once it completes (prevents spam attack)
                         StartCoroutine(HandleAttack(() => ChangeAIState(EnemyAIState.Wait)));
                     }
-                    if (Random.value < 0.03f) // 10% chance to strafe instead of attack
+                    if (Random.value < 0.03f) // 3% chance to strafe instead of attack
                     {
                         waitStartTime = Time.time;
                         ChangeAIState(EnemyAIState.Strafe);
