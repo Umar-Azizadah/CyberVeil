@@ -4,13 +4,13 @@ using UnityEngine;
 namespace CyberVeil.Player
 {
     /// <summary>
-    /// Represents modifiers(upgrades) that change the player's stats.
+    /// Central manager for stat upgrades for the player
     /// The base stats (like default health, base damage, etc.) live in other scripts,
-    /// at runtime, reads from this class to get adjusted values (damage, movement, dash distance, HP).
+    /// at runtime, reads from this class to get upgraded values (damage, movement, dash distance, HP)
     /// </summary>
-    public class PlayerStatModifiers : MonoBehaviour
+    public class PlayerStatsUpgradeManager : MonoBehaviour
     {
-        public static PlayerStatModifiers Instance { get; private set; }
+        public static PlayerStatsUpgradeManager Instance { get; private set; }
 
         [Header("Multipliers")]
         [Tooltip("1.0 = no change, 1.1 = +10% damage")]
@@ -23,7 +23,7 @@ namespace CyberVeil.Player
         [SerializeField] private float dashDistanceAdd = 0f;
         
         /// <summary>
-        /// Event triggered whenever any stat modifier changes, other scrips subscribe to this
+        /// Event triggered whenever any stat upgrade changes, other scrips subscribe to this
         /// to refresh derived values whenever an upgrade is applied.
         /// <summary>
         public event Action OnChanged;
