@@ -3,6 +3,7 @@ using CyberVeil.Core;
 using CyberVeil.VFX;
 using UnityEngine;
 using System;
+using CyberVeil.Player;
 
 namespace CyberVeil.Combat
 {
@@ -19,11 +20,11 @@ namespace CyberVeil.Combat
         public event Action<HealthComponent> OnHealthChanged; // Event for UI (or other systems) to suscribe to whenever health changes
 
         // Public readonly to expose private fields
-        public float Normalized => maxHealth > 0 ? (float)currentHealth / maxHealth : 0f; // Returns health as a percentage for use in UI
+        public float Normalized => GetEffectiveMax() > 0 ? (float)currentHealth / GetEffectiveMax() : 0f; // Returns health as a percentage for use in UI
 
         private void Awake()
         {
-            currentHealth = maxHealth; // Sets health to max at start      
+           currentHealth = GetEffectiveMax();; // Sets health to max at start      
         }
 
         private void OnEnable()
@@ -38,7 +39,7 @@ namespace CyberVeil.Combat
         /// <param name="damage">The amount of damage to apply.</param>
         public void TakeDamage(int damage)
         {
-            currentHealth -= damage;
+            currentHealth = Mathf.Clamp(currentHealth - damage, 0, GetEffectiveMax());
 
             OnHealthChanged?.Invoke(this); // Broadcast new health state to UI
 
@@ -59,6 +60,17 @@ namespace CyberVeil.Combat
                 Die();
             }
         }
+
+        private int GetEffectiveMax()
+        {
+            // Only the PLAYER gets the bonus; others use base maxHealth unchanged
+            if (faction != Faction.Player) return maxHealth;
+
+            var mods = PlayerStatModifiers.Instance;
+            float pct = mods ? mods.MaxHealthPct : 0f;   // e.g., 0.20f = +20%
+            return Mathf.Max(1, Mathf.RoundToInt(maxHealth * (1f + pct)));
+        }
+
 
         private void Die()
         {

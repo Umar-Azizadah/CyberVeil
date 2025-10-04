@@ -141,9 +141,11 @@ namespace CyberVeil.Player
             else // Walk - normal speed.
             {
                 speed = defaultSpeed;
+                // Query the upgrade manager singleton for a flat move-speed bonus and adds to base
+                var mods = CyberVeil.Player.PlayerStatsUpgradeManager.Instance;
+                if (mods) speed += mods.MoveSpeedAdd; 
                 movement = moveDirection * speed;
             }
-
 
             // Applies manual gravity, keeps player grounded using CharacterController
             if (!characterController.isGrounded)

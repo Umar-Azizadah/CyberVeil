@@ -69,8 +69,7 @@ namespace CyberVeil.Player
             canDash = false;
             SoundManager.PlaySound(SoundType.DASH, dashVol);
 
-            // Visuals
-            
+            // Visuals 
             ParticleManager.Instance.PlayEffect(VFXType.Teleport, transform.position, Quaternion.identity);
             if (mainCam != null) mainCam.fieldOfView = dashFOV;
             StartCoroutine(dissolveHandler.DissolveOut(dissolveHandler.dissolveDashMaterial, dissolveDuration));
@@ -80,7 +79,13 @@ namespace CyberVeil.Player
             Vector3 dashDirection = transform.forward;
             while (timer < dashDuration)
             {
-                controller.Move(dashDirection * dashSpeed * Time.deltaTime); // Pushes player forward during dash
+                var mods = CyberVeil.Player.PlayerStatsUpgradeManager.Instance;
+
+                // Query the upgrade manager singleton for a flat distance bonus and adds to base
+                float extraPerSecond = (mods ? mods.DashDistanceAdd : 0f) / dashDuration;
+                float effectiveSpeed = dashSpeed + extraPerSecond;
+
+                controller.Move(dashDirection * effectiveSpeed * Time.deltaTime);
                 timer += Time.deltaTime;
                 yield return null;
             }

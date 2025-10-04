@@ -46,7 +46,7 @@ namespace CyberVeil.Player
             playerController = GetComponent<PlayerController>();
             stateMachine = GetComponent<CharacterStateMachine>();
             attackGate = GetComponent<AttackLimiterMechanic>();
-            
+
 
             toggleAxe.HideAxe();
             toggleAxe2.HideAxe2();
@@ -83,7 +83,11 @@ namespace CyberVeil.Player
             stateMachine.ChangeState(CharacterState.Attacking);
             Invoke(nameof(EndAttack), attackDuration);
 
-            CombatManager.Instance.DealDamageInRadius(transform.position, attackRange, attackDamage, gameObject);
+            // Reads DamageMultiplier from the manager, if mods is null it safely falls back to 1f (no bonus)
+            var mods = PlayerStatsUpgradeManager.Instance;
+            float dmgMul = mods ? mods.DamageMultiplier : 1f;
+            int finalDamage = Mathf.RoundToInt(attackDamage * dmgMul);
+            CombatManager.Instance.DealDamageInRadius(transform.position, attackRange, finalDamage, gameObject);
 
             // Trigger slash effect using centralized ParticleManager
             Vector3 attackDirection = playerController.GetLastDirection();
