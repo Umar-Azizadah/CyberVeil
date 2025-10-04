@@ -48,7 +48,7 @@ namespace CyberVeil.Player
                 ParticleManager.Instance.PlayEffect(VFXType.SlashImpact, hitPos, Quaternion.identity);
 
                 //apply hit stop
-                HitstopManager.Instance.DoHitstop(0.07f, 0f); //adjust duration & freeze level
+                HitstopManager.Instance.DoHitstop(0.04f, 0f); //adjust duration & freeze level
 
             }
         }

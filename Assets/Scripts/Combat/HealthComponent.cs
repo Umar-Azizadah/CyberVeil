@@ -66,7 +66,7 @@ namespace CyberVeil.Combat
             // Only the PLAYER gets the bonus; others use base maxHealth unchanged
             if (faction != Faction.Player) return maxHealth;
 
-            var mods = PlayerStatModifiers.Instance;
+            var mods = PlayerStatsUpgradeManager.Instance;
             float pct = mods ? mods.MaxHealthPct : 0f;   // e.g., 0.20f = +20%
             return Mathf.Max(1, Mathf.RoundToInt(maxHealth * (1f + pct)));
         }
