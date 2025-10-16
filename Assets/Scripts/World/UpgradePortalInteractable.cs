@@ -25,9 +25,9 @@ namespace CyberVeil.World
         /// <summary>
         /// Opens the upgrade menu and hides the interact prompt while the menu is active
         /// </summary>
-        public void Interact(IInteractor interactor)
+        public void Interact(IInteractor interactor) // Called by the PlayerInteractor when the player presses E on this object
         {
-            if (flow != null)
+            if (flow != null) // If an interaction coroutine is already running stop it to prevent overlapping flows
                 StopCoroutine(flow);
 
             var promptUI = FindObjectOfType<InteractPromptUI>(true);
