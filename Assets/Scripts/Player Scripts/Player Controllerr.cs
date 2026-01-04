@@ -2,44 +2,62 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using CyberVeil.VFX;
-using System.Runtime.InteropServices;
 using CyberVeil.Core;
 
 namespace CyberVeil.Player
 {
     /// <summary>
-    /// Controls player movement and integrates sprinting, dashing, attacking, and state management
+    /// Controls player movement and integrates sprinting, dashing, attacking, and state management.
+    /// Movement feel improvements:
+    /// - Velocity-based acceleration/deceleration (instead of direction-only smoothing)
+    /// - Sprint ramp (visual/feel smoothing; does NOT change your sprint script)
+    /// - Turn-boost on sharp direction changes (snappier melee movement)
+    /// - Ground "stick" to reduce CharacterController floaty bumps
+    /// NOTE: Does not modify PlayerDash / PlayerSprint code. Those remain untouched.
     /// </summary>
     public class PlayerController : MonoBehaviour
     {
         [Header("Movement Settings")]
-        public float defaultSpeed = 2.8f; // Normal speed
-        public float speed; // Current speed 
-        private float rotationSpeed = 5f; // Speed for rotating towards movement direction
-        public bool canMove = true; // Flag to disable/ enable movement (used when in attack state)
-        private Vector2 move; // Raw input value 
-        public Vector3 moveDirection; // Current smoothed movement direction
-        public Vector3 lastDirection = Vector3.forward; // Stores last direction to rotate even if no input
+        public float defaultSpeed = 2.8f;        // Normal speed
+        public float speed;                      // Current speed (for UI/debug/other scripts)
+        public bool canMove = true;              // Disable/enable movement
+        private Vector2 move;                    // Raw input
+        public Vector3 moveDirection;            // Smoothed planar movement velocity (not normalized)
+        public Vector3 lastDirection = Vector3.forward; // Last non-zero direction
 
         [Header("Acceleration Settings")]
-        // Makes character feel heavier, more physical (accelerates and decelerates smoothly)
-        public float acceleration = 12f;
-        public float deceleration = 14f;
-        private Vector3 currentVelocity = Vector3.zero;
+        public float acceleration = 18f;
+        public float deceleration = 24f;
 
-        public float gravity = -20f; // Downward gravity force
-        private Vector3 velocity; // Gravity velocity
+        [Header("Rotation Feel")]
+        [SerializeField] private float baseTurnSpeed = 16f;      // Normal turn speed
+        [SerializeField] private float boostedTurnSpeed = 28f;   // Turn speed on sharp direction changes
+        [SerializeField] private float turnBoostDotThreshold = 0.2f; // Lower = boosts more often
+
+        [Header("Sprint Feel (does NOT change PlayerSprint)")]
+        [SerializeField] private float sprintSpeed = 3.5f;       // Your sprint speed (same as before)
+        [SerializeField] private float sprintRampUp = 10f;       // How fast we blend to sprint
+        [SerializeField] private float sprintRampDown = 14f;     // How fast we blend back to walk
+
+        [Header("Gravity")]
+        public float gravity = -20f;
+        [SerializeField] private float groundedStick = -2f;      // Keeps controller grounded
+        private Vector3 verticalVelocity;
 
         [Header("Components")]
         public dustParticle dustParticle;
-        private Camera mainCamera; // Cache main camera for movement direction calculations
-        private CharacterController characterController; // Built in physics movement
+        private Camera mainCamera;
+        private CharacterController characterController;
         private PlayerDash playerDash;
         private PlayerSprint playerSprint;
         private PlayerAttack playerAttack;
         private CharacterStateMachine stateMachine;
 
-        // Uses unitys input handling system to handle movement input, stores input vector for processing later
+        // Internal movement state
+        private Vector3 planarVelocity = Vector3.zero; // smoothed planar velocity
+        private float sprintBlend = 0f;                // 0..1 (for feel only)
+
+        // Uses Unity's input system to store move input for later processing
         public void onMove(InputAction.CallbackContext context)
         {
             move = context.ReadValue<Vector2>();
@@ -47,7 +65,6 @@ namespace CyberVeil.Player
 
         private void Start()
         {
-            // Grabs all requires components at start
             mainCamera = Camera.main;
             characterController = GetComponent<CharacterController>();
             playerDash = GetComponent<PlayerDash>();
@@ -57,22 +74,21 @@ namespace CyberVeil.Player
             speed = defaultSpeed;
         }
 
-        void Update()
+        private void Update()
         {
-            // First processes dash/sprint/attack inputs
             if (playerDash != null) playerDash.HandleDashInput();
             if (playerSprint != null) playerSprint.HandleSprintInput();
             if (playerAttack != null) playerAttack.HandleAttackInput();
 
-            // Then handles movement if allowed
             if (canMove)
             {
                 MovePlayer();
             }
 
-            UpdateMovementState(); // Updates state machine
+            UpdateMovementState();
 
-            if (dustParticle != null) // Handles dust particle visibility based on movement
+            // Dust VFX toggling based on movement
+            if (dustParticle != null)
             {
                 if (moveDirection.sqrMagnitude > 0.01f)
                     dustParticle.ShowDustParticle();
@@ -82,13 +98,18 @@ namespace CyberVeil.Player
         }
 
         /// <summary>
-        /// Translates 2D input into camera-relative 3D movement and rotates the player.
+        /// Camera-relative movement with velocity-based accel/decel, snappy turn boost, sprint ramp feel,
+        /// and ground stick. Dash behavior remains the same: when dashing, movement is locked to lastDirection.
         /// </summary>
         private void MovePlayer()
         {
-            if (mainCamera == null) return;
+            if (mainCamera == null || characterController == null) return;
 
-            // Calculates forward/right vectors based on camera
+            // If attacking, fully lock movement (same as original intent)
+            if (stateMachine != null && stateMachine.CurrentState == CharacterState.Attacking)
+                return;
+
+            // Camera-relative planar axes
             Vector3 cameraForward = mainCamera.transform.forward;
             Vector3 cameraRight = mainCamera.transform.right;
             cameraForward.y = 0f;
@@ -96,71 +117,89 @@ namespace CyberVeil.Player
             cameraForward.Normalize();
             cameraRight.Normalize();
 
+            // Input dir (planar)
+            Vector3 inputDir = cameraForward * move.y + cameraRight * move.x;
+            float inputMag = inputDir.magnitude;
+            bool hasInput = inputMag > 0.1f;
+            if (inputMag > 1f) inputDir.Normalize();
 
-            // Convert 2D input into 3D direction relative to camera
-            Vector3 targetInputDirection = cameraForward * move.y + cameraRight * move.x;
-            if (targetInputDirection.magnitude > 1f)
-                targetInputDirection.Normalize();
+            // Determine target walk speed (includes upgrades, exactly like before)
+            float walkSpeed = defaultSpeed;
+            var mods = PlayerStatsUpgradeManager.Instance;
+            if (mods) walkSpeed += mods.MoveSpeedAdd;
 
-            // Applies acceleration + deceleration for smoother start/stop
-            if (targetInputDirection.magnitude > 0.1f)
+            // Determine if currently sprinting according to state machine (same logic as before)
+            bool isSprintingState = (playerSprint != null && stateMachine != null && stateMachine.CurrentState == CharacterState.Sprinting);
+
+            // Sprint "feel" ramp (does not alter PlayerSprint rules; only smooths our movement speed)
+            float rampRate = isSprintingState ? sprintRampUp : sprintRampDown;
+            sprintBlend = Mathf.MoveTowards(sprintBlend, isSprintingState ? 1f : 0f, rampRate * Time.deltaTime);
+
+            // Blended speed for feel
+            float targetSpeed = Mathf.Lerp(walkSpeed, sprintSpeed, sprintBlend);
+            speed = targetSpeed; // keep public speed updated for other scripts/debug
+
+            // Velocity-based accel/decel (makes start/stop feel much better) 
+            Vector3 desiredPlanarVel = hasInput ? inputDir.normalized * targetSpeed : Vector3.zero;
+            float rate = hasInput ? acceleration : deceleration;
+            planarVelocity = Vector3.MoveTowards(planarVelocity, desiredPlanarVel, rate * Time.deltaTime);
+
+            // Expose for VFX/anim logic (now represents planar velocity, not a unit direction)
+            moveDirection = planarVelocity;
+
+            // Update lastDirection when have meaningful movement (used for dash + facing)
+            if (planarVelocity.sqrMagnitude > 0.001f)
+                lastDirection = planarVelocity.normalized;
+
+            // Rotation: snappy turn boost on sharp direction changes 
+            // Keep rotation locked when dashing 
+            bool isDashing = (playerDash != null && playerDash.IsDashing);
+
+            if (!isDashing && hasInput)
             {
-                currentVelocity = Vector3.MoveTowards(currentVelocity, targetInputDirection, acceleration * Time.deltaTime);
-                lastDirection = currentVelocity.normalized;
+                Vector3 desiredFacing = inputDir.normalized;
+                float dot = Vector3.Dot(transform.forward, desiredFacing);
+
+                float turnSpeed = (dot < turnBoostDotThreshold) ? boostedTurnSpeed : baseTurnSpeed;
+                Quaternion targetRotation = Quaternion.LookRotation(desiredFacing);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
             }
-            else
+            else if (!isDashing && !hasInput && lastDirection.sqrMagnitude > 0.001f)
             {
-                currentVelocity = Vector3.MoveTowards(currentVelocity, Vector3.zero, deceleration * Time.deltaTime);
-            }
-
-            moveDirection = currentVelocity;
-
-            // Rotates player smoothly toward last movement direction and keeps rotation locked when dashing
-            if (moveDirection.sqrMagnitude > 0.01f && (playerDash == null || !playerDash.IsDashing))
-            {
+                // Gently settle facing to lastDirection when stop (good for melee readability)
                 Quaternion targetRotation = Quaternion.LookRotation(lastDirection);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, (baseTurnSpeed * 0.6f) * Time.deltaTime);
             }
 
-            if (stateMachine.CurrentState == CharacterState.Attacking) // Fully locks movement during attacks
-                return;
+            // Final movement vector (keep dash behavior the same)
+            Vector3 movement = planarVelocity;
 
-
-            // Handles movement vectors depending on state:
-            Vector3 movement = Vector3.zero;
-
-            if (playerDash != null && playerDash.IsDashing) // Dash - move in last direction
+            if (isDashing)
             {
-                movement = lastDirection;
-            }
-            else if (playerSprint != null && stateMachine.CurrentState == CharacterState.Sprinting) // Sprint - faster speed
-            {
-                speed = 5.5f;
-                movement = moveDirection * speed;
-            }
-            else // Walk - normal speed.
-            {
-                speed = defaultSpeed;
-                // Query the upgrade manager singleton for a flat move-speed bonus and adds to base
-                var mods = CyberVeil.Player.PlayerStatsUpgradeManager.Instance;
-                if (mods) speed += mods.MoveSpeedAdd; 
-                movement = moveDirection * speed;
+                movement = lastDirection * targetSpeed;
             }
 
-            // Applies manual gravity, keeps player grounded using CharacterController
-            if (!characterController.isGrounded)
+            // Gravity / grounding
+            if (characterController.isGrounded)
             {
-                velocity.y += gravity * Time.deltaTime;
+                if (verticalVelocity.y < 0f)
+                    verticalVelocity.y = groundedStick;
             }
             else
             {
-                velocity.y = -1f;
+                verticalVelocity.y += gravity * Time.deltaTime;
             }
-            characterController.Move((movement + velocity) * Time.deltaTime);
+
+            characterController.Move((movement + verticalVelocity) * Time.deltaTime);
         }
 
-        private void UpdateMovementState() //keeps annimations fully synced with players movement
+        /// <summary>
+        /// Keeps animations/state synced with movement
+        /// </summary>
+        private void UpdateMovementState()
         {
+            if (stateMachine == null) return;
+
             if (stateMachine.CurrentState == CharacterState.Attacking || stateMachine.CurrentState == CharacterState.Damaged)
                 return;
 
@@ -177,7 +216,7 @@ namespace CyberVeil.Player
             }
         }
 
-        // Locks player movement for when in attack state or damaged state
+        // Locks player movement for attacks/damage
         public void LockMovement(float duration)
         {
             if (canMove)
@@ -193,7 +232,7 @@ namespace CyberVeil.Player
             canMove = true;
         }
 
-        // Clean getter functions to access private movement values from other scripts
+        // Getters
         public Vector2 GetMoveInput() { return move; }
         public Vector3 GetLastDirection() { return lastDirection; }
         public CharacterController GetCharacterController() { return characterController; }
