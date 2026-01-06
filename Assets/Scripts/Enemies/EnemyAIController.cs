@@ -18,6 +18,17 @@ namespace CyberVeil.Enemies
         [Header("Ranges")]
         public float detectionRange = 4f;
 
+        [Header("Strafe Settings")]
+        [Tooltip("Chance to attempt a strafe each evaluation (0-1)")]
+        public float strafeChance = 0.03f;
+        [Tooltip("Minimum seconds between strafes")]
+        public float strafeCooldown = 3f;
+        [Tooltip("Minimum distance to player to allow strafing")]
+        public float strafeMinDistance = 1.5f;
+        [Tooltip("Maximum distance to player to allow strafing")]
+        public float strafeMaxDistance = 6f;
+        private float lastStrafeTime = -999f;
+
         private float attackCooldown = 1.5f;
         public float lastAttackTime = -999f;
         private float waitStartTime = -1f;
@@ -83,8 +94,10 @@ namespace CyberVeil.Enemies
                     characterStateMachine.ChangeState(CharacterState.Moving);
                     if (attackSelector.HasAttackReady())
                         ChangeAIState(EnemyAIState.Attack);
-                    if (Random.value < 0.03f) // 3% chance to strafe instead of chase or attack
+                    // Conditional strafe: chance, cooldown, and distance window
+                    if (Time.time - lastStrafeTime > strafeCooldown && Random.value < strafeChance && distance >= strafeMinDistance && distance <= strafeMaxDistance)
                     {
+                        lastStrafeTime = Time.time;
                         waitStartTime = Time.time;
                         ChangeAIState(EnemyAIState.Strafe);
                     }
@@ -119,12 +132,7 @@ namespace CyberVeil.Enemies
                         // Begins the attack and transitions to Wait once it completes (prevents spam attack)
                         StartCoroutine(HandleAttack(() => ChangeAIState(EnemyAIState.Wait)));
                     }
-                    if (Random.value < 0.03f) // 3% chance to strafe instead of attack
-                    {
-                        waitStartTime = Time.time;
-                        ChangeAIState(EnemyAIState.Strafe);
-                    }
-
+                    
                     break;
 
                 case EnemyAIState.Wait:
@@ -172,6 +180,10 @@ namespace CyberVeil.Enemies
                     if (attackLogic != null)
                         yield return StartCoroutine(attackLogic.ExecuteAttack());
 
+                    // Ensure the AI stays in Attacking state at least for the attack's duration (animation sync)
+                    if (currentAttack.attackDuration > 0f)
+                        yield return new WaitForSeconds(currentAttack.attackDuration);
+
                     Destroy(attackInstance);
                 }
                 else
@@ -179,7 +191,11 @@ namespace CyberVeil.Enemies
                     // Internal attack (used by Mushroom with EnemyBasicAttack + MushroomShieldAttack)
                     IEnemyAttack internalAttack = GetComponent<IEnemyAttack>();
                     if (internalAttack != null)
+                    {
                         yield return StartCoroutine(internalAttack.ExecuteAttack());
+                        // small default buffer to ensure animation completes for internal attacks
+                        yield return new WaitForSeconds(0.5f);
+                    }
                 }
             }
 
