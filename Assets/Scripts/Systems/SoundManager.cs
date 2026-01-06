@@ -19,6 +19,7 @@ namespace CyberVeil.Systems
         DASH,
         SHIELDATTK,
         ATTACKLOCK,
+        TRIALEND,
     }
 
     // Ensures an audio source is on the game object and lets the script run in the editor
@@ -46,14 +47,44 @@ namespace CyberVeil.Systems
 
         private void Awake()
         {
+            // Enforce singleton: if another SoundManager exists, destroy this duplicate
+            if (instance != null && instance != this)
+            {
+                // If you prefer to keep a single SoundManager across scenes, consider using DontDestroyOnLoad on the original.
+                Destroy(gameObject);
+                return;
+            }
+
             instance = this;
 
-            sfxAudioSource = gameObject.AddComponent<AudioSource>();
+            // Ensure we have a dedicated SFX AudioSource. There will always be at least one AudioSource due to RequireComponent,
+            // so reuse an existing second AudioSource if present, otherwise create one.
+            var existingAudioSources = GetComponents<AudioSource>();
+            if (existingAudioSources.Length > 1)
+            {
+                // Use the second AudioSource as the SFX source (first is reserved for background music)
+                sfxAudioSource = existingAudioSources[1];
+            }
+            else
+            {
+                sfxAudioSource = gameObject.AddComponent<AudioSource>();
+            }
 
-            // Only create one footstep audio source
-            GameObject footstepObject = new GameObject("FootstepAudioSource");
-            footstepObject.transform.SetParent(transform);
-            footstepAudioSource = footstepObject.AddComponent<AudioSource>();
+            // Only create the FootstepAudioSource GameObject if it doesn't already exist as a child
+            Transform footstepChild = transform.Find("FootstepAudioSource");
+            if (footstepChild != null)
+            {
+                footstepAudioSource = footstepChild.GetComponent<AudioSource>();
+                if (footstepAudioSource == null)
+                    footstepAudioSource = footstepChild.gameObject.AddComponent<AudioSource>();
+            }
+            else
+            {
+                GameObject footstepObject = new GameObject("FootstepAudioSource");
+                footstepObject.transform.SetParent(transform);
+                footstepAudioSource = footstepObject.AddComponent<AudioSource>();
+            }
+
             footstepAudioSource.loop = true;
         }
 
