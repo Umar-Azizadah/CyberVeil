@@ -36,8 +36,18 @@ namespace CyberVeil.UI
             for (int i = 0; i < cardButtons.Length; i++) // Looping through buttons
             {
                 int idx = i; // Stores i to capture the correct index
-                cardButtons[i].onClick.RemoveAllListeners();
-                cardButtons[i].onClick.AddListener(() => OnPick(idx));
+                var btn = cardButtons[i];
+                if (btn == null) continue;
+
+                // Ensure a PlaySoundOnHover component exists so hovering/clicking plays SFX
+                var hover = btn.GetComponent<PlaySoundOnHover>();
+                if (hover == null)
+                {
+                    btn.gameObject.AddComponent<PlaySoundOnHover>();
+                }
+
+                btn.onClick.RemoveAllListeners();
+                btn.onClick.AddListener(() => OnPick(idx));
             }
         }
 
@@ -108,10 +118,38 @@ namespace CyberVeil.UI
             while (PickedIndex == null)
                 yield return null;
 
-            // I Can apply upgrade here by using an upgrade manager
-            // UpgradeManager.Instance.ApplyUpgrade(PickedIndex.Value);
+            // Apply a simple default upgrade mapping when a card is picked.
+            // This uses the PlayerStatsUpgradeManager to modify player stats and then
+            // notifies the WaveManager to continue after upgrade.
+            ApplyPickedUpgrade(PickedIndex.Value);
 
             Hide(); // Hides after choice is made 
+        }
+
+        // Simple, data-free mapping from card index to a sample upgrade effect.
+        // Designers can replace this with a data-driven system later.
+        private void ApplyPickedUpgrade(int index)
+        {
+            var mods = CyberVeil.Player.PlayerStatsUpgradeManager.Instance;
+            if (mods == null) return;
+
+            // Example mapping: 0 = +10% damage, 1 = +20% max health, 2 = +0.1 move speed
+            switch (index)
+            {
+                case 0:
+                    mods.AddDamageMultiplier(0.3f);
+                    break;
+                case 1:
+                    mods.AddDashDistance(0.6f);
+                    break;
+                case 2:
+                    mods.AddMoveSpeed(0.5f);
+                    break;
+            }
+
+            // Notify wave manager to continue the run after upgrades (if present)
+            var wm = GameObject.FindObjectOfType<CyberVeil.Systems.WaveManager>();
+            wm?.ContinueAfterUpgrade();
         }
     }
 }
