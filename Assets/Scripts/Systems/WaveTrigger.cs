@@ -8,9 +8,10 @@ namespace CyberVeil.Systems
 
         void Update()
         {
-            if (!waveManager.IsWaveInProgress() && Input.GetKeyDown(KeyCode.N))
+            // Start run (going to change how it starts later)
+            if (Input.GetKeyDown(KeyCode.N))
             {
-                waveManager.StartNextWave();
+                waveManager.StartRun();
             }
         }
     }
