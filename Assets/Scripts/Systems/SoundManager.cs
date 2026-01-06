@@ -20,6 +20,9 @@ namespace CyberVeil.Systems
         SHIELDATTK,
         ATTACKLOCK,
         TRIALEND,
+        CARDHOVER,
+        CARDCLICK,
+        CARDCYBER,
     }
 
     // Ensures an audio source is on the game object and lets the script run in the editor
