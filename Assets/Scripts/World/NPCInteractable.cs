@@ -22,10 +22,10 @@ namespace CyberVeil.World
         [SerializeField]
         private string[] lines = // Lines the npc will say in order
         {
-            "The Veil fractures crimson blight spilling through hollow halls of flesh and iron.",
+            "The Veil fractures, crimson blight spills throughout.",
             "Corruption devours the very veins of neon that once lit our world.",
-            "The hordes that comes are not begotten, but forged, reworked in the corruptions guise",
-            "Cleanse the crystal when the slaughter wanes, the portal shall shape its remnants into power."
+            "The hordes that comes are forged, reworked in the corruptions guise",
+            "Cleanse the crystal, and when the slaughter wanes, the portal shall shape its remnants into power."
         };
         [SerializeField] private DialogueUI dialogue;
         [SerializeField] private float autoAdvanceSeconds = 4f;
