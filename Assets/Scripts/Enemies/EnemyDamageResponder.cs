@@ -11,6 +11,11 @@ namespace CyberVeil.Enemies
     {
         private EnemyAIController aiController;
 
+        [Header("Stagger Settings")]
+        [Range(0f,1f)]
+        [Tooltip("Chance (0-1) that the enemy will stagger when damaged")] 
+        public float staggerChance = 1f; // default: always stagger
+
         private void Start()
         {
             aiController = GetComponent<EnemyAIController>();
@@ -20,7 +25,12 @@ namespace CyberVeil.Enemies
         {
             if (aiController != null)
             {
-                aiController.ChangeAIState(EnemyAIState.Damaged);
+                // Roll to determine whether the enemy should enter the Damaged (stagger) state
+                if (Random.value <= staggerChance)
+                {
+                    aiController.ChangeAIState(EnemyAIState.Damaged);
+                }
+                
             }
         }
     }
