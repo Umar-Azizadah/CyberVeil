@@ -42,9 +42,30 @@ namespace CyberVeil.World
         /// </summary>
         private IEnumerator RunInteraction(IInteractor interactor)
         {
-            if (UpgradeMenu.Instance != null)
+            // Start a cinematic hold on the portal and keep it active while the upgrade menu is open
+            bool holdStarted = false;
+            if (CyberVeil.Systems.CinematicCamera.Instance != null)
             {
-                yield return UpgradeMenu.Instance.ShowAndWait();
+                CyberVeil.Systems.CinematicCamera.Instance.StartHoldFocus(transform);
+                holdStarted = true;
+            }
+
+            try
+            {
+                // small delay so the camera has time to move in before the menu appears
+                yield return new WaitForSecondsRealtime(1f);
+
+                if (UpgradeMenu.Instance != null)
+                {
+                    yield return UpgradeMenu.Instance.ShowAndWait();
+                }
+            }
+            finally
+            {
+                if (holdStarted && CyberVeil.Systems.CinematicCamera.Instance != null)
+                {
+                    CyberVeil.Systems.CinematicCamera.Instance.EndHoldFocus();
+                }
             }
 
             var promptUI = FindObjectOfType<InteractPromptUI>(true);
