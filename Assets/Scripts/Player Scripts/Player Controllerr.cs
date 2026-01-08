@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using CyberVeil.VFX;
 using CyberVeil.Core;
+using CyberVeil.Systems;
 
 namespace CyberVeil.Player
 {
@@ -76,21 +77,37 @@ namespace CyberVeil.Player
 
         private void Update()
         {
-            if (playerDash != null) playerDash.HandleDashInput();
-            if (playerSprint != null) playerSprint.HandleSprintInput();
-            if (playerAttack != null) playerAttack.HandleAttackInput();
+            // If a cinematic camera is active, prevent movement and movement-like inputs
+            bool cinematicActive = false;
+            if (CinematicCamera.Instance != null)
+                cinematicActive = CinematicCamera.Instance.IsActive;
 
-            if (canMove)
+            if (!cinematicActive)
             {
-                MovePlayer();
-            }
+                if (playerDash != null) playerDash.HandleDashInput();
+                if (playerSprint != null) playerSprint.HandleSprintInput();
+                if (playerAttack != null) playerAttack.HandleAttackInput();
 
-            UpdateMovementState();
+                if (canMove)
+                {
+                    MovePlayer();
+                }
+
+                UpdateMovementState();
+            }
+            else
+            {
+                // While cinematic is active force player to idle and hide movement VFX
+                if (stateMachine != null)
+                    stateMachine.ChangeState(CharacterState.Idle);
+            }
 
             // Dust VFX toggling based on movement
             if (dustParticle != null)
             {
-                if (moveDirection.sqrMagnitude > 0.01f)
+                if (cinematicActive)
+                    dustParticle.HideDustParticle();
+                else if (moveDirection.sqrMagnitude > 0.01f)
                     dustParticle.ShowDustParticle();
                 else
                     dustParticle.HideDustParticle();
