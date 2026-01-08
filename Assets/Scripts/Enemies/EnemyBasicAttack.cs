@@ -20,7 +20,8 @@ namespace CyberVeil.Enemies
 
         private void Start()
         {
-            visualEffect = GetComponent<IAttackEffect>(); // Check for optional VFX effect on this object
+            // Check for an optional VFX effect on this object or any child (some enemies keep VFX on a child object)
+            visualEffect = GetComponent<IAttackEffect>() ?? GetComponentInChildren<IAttackEffect>();
         }
 
         /// <summary>
@@ -40,5 +41,12 @@ namespace CyberVeil.Enemies
             // Applies damage to player
             CombatManager.Instance.DealDamageInRadius(transform.position, attackRadius, damageAmount, transform.root.gameObject);
         }
+
+            // Animation events in Unity cannot directly start coroutines that return IEnumerator.
+            // Use this wrapper if you want to call the attack from an AnimationEvent on the enemy's Animator.
+            public void TriggerExecuteAttack()
+            {
+                StartCoroutine(ExecuteAttack());
+            }
     }
 }

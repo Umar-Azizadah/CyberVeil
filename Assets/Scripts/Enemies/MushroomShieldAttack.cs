@@ -18,6 +18,12 @@ namespace CyberVeil.Enemies
 
         public IEnumerator PerformEffect(float delay)
         {
+            if (shieldTransform == null)
+            {
+                Debug.LogWarning("MushroomShieldAttack: shieldTransform is not assigned. Skipping shield effect.", this);
+                yield break;
+            }
+
             Vector3 original = shieldTransform.localPosition;
             Vector3 lunge = original + shieldTransform.forward * -0.5f;
 
