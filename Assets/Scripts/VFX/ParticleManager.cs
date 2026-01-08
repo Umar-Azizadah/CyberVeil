@@ -18,6 +18,7 @@ namespace CyberVeil.VFX
         MushroomShieldParticle,
         Teleport,
         SlimeSplat,
+        GROUNDSLAM,
     }
 
     /// <summary>
