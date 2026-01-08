@@ -54,6 +54,10 @@ namespace CyberVeil.Player
 
         public void HandleDashInput()
         {
+            // Respect cinematic mode: do not allow dashing while a cinematic is active
+            if (CinematicCamera.Instance != null && CinematicCamera.Instance.IsActive)
+                return;
+
             if (Keyboard.current?.spaceKey.wasPressedThisFrame == true && canDash && !isDashing && playerState.CurrentState != CharacterState.Attacking)
             {
                 StartCoroutine(PerformDash());
