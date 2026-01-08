@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using CyberVeil.Systems;
 
 namespace CyberVeil.Player
 {
@@ -37,6 +38,10 @@ namespace CyberVeil.Player
 
         void LateUpdate()
         {
+            // If a cinematic is active, do not process mouse input or change the camera transform
+            if (CinematicCamera.Instance != null && CinematicCamera.Instance.IsActive)
+                return;
+
             if (target == null)
                 return;
 
