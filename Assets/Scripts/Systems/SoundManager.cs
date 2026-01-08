@@ -23,6 +23,8 @@ namespace CyberVeil.Systems
         CARDHOVER,
         CARDCLICK,
         CARDCYBER,
+        GROUNDSLAMNOISE,
+        WINDUP,
     }
 
     // Ensures an audio source is on the game object and lets the script run in the editor
@@ -47,6 +49,10 @@ namespace CyberVeil.Systems
         private AudioSource audioSource; // Used for background music 
         private AudioSource footstepAudioSource; // Dedicated audio source for footsteps
         private AudioSource sfxAudioSource;// Uses one-shot SFX
+    // Runtime-managed background music players (allow multiple simultaneous tracks)
+    private Dictionary<int, AudioSource> backgroundMusicPlayers = new Dictionary<int, AudioSource>();
+    private List<AudioClip> runtimeBackgroundClips = new List<AudioClip>();
+    private int nextBgMusicId = 1;
 
         private void Awake()
         {
@@ -95,7 +101,9 @@ namespace CyberVeil.Systems
         private void Start()
         {
             audioSource = GetComponent<AudioSource>(); //accesses audio source
-            PlayBackgroundMusic();
+            // Play default first background track if available (legacy behavior)
+            if (audioSource != null)
+                PlayBackgroundMusic();
         }
 
         /// <summary>
@@ -138,16 +146,126 @@ namespace CyberVeil.Systems
 
         public static void PlayBackgroundMusic()
         {
-            AudioClip[] musicClips = instance.soundList[(int)SoundType.BACKGROUNDMUSIC].Sounds;
-            AudioClip backgroundMusic = musicClips[0];
-            instance.audioSource.clip = backgroundMusic;
+            // Legacy single-track background music: plays first clip from either runtime list or built-in list
+            if (instance == null) return;
+
+            AudioClip clipToPlay = null;
+            if (instance.runtimeBackgroundClips.Count > 0)
+                clipToPlay = instance.runtimeBackgroundClips[0];
+            else
+            {
+                AudioClip[] musicClips = instance.soundList[(int)SoundType.BACKGROUNDMUSIC].Sounds;
+                if (musicClips != null && musicClips.Length > 0)
+                    clipToPlay = musicClips[0];
+            }
+
+            if (clipToPlay == null) return;
+
+            instance.audioSource.clip = clipToPlay;
             instance.audioSource.loop = true;
             instance.audioSource.Play();
         }
 
         public static void StopBackgroundMusic()
         {
+            if (instance == null) return;
             instance.audioSource.Stop();
+            // stop any runtime background players as well
+            foreach (var kv in instance.backgroundMusicPlayers)
+            {
+                if (kv.Value != null) kv.Value.Stop();
+            }
+            // destroy the runtime player GameObjects
+            var keys = new List<int>(instance.backgroundMusicPlayers.Keys);
+            foreach (var k in keys)
+            {
+                var src = instance.backgroundMusicPlayers[k];
+                if (src != null) Destroy(src.gameObject);
+                instance.backgroundMusicPlayers.Remove(k);
+            }
+        }
+
+        /// <summary>
+        /// Play a background music clip by index. Index first indexes into runtime-added clips then falls back to built-in BACKGROUNDMUSIC.
+        /// Returns an id for the created music player (use StopBackgroundMusicById to stop), or -1 on failure.
+        /// </summary>
+        public static int PlayBackgroundMusicByIndex(int index, bool loop = true, float volume = 1f)
+        {
+            if (instance == null) return -1;
+
+            AudioClip clip = null;
+            if (index >= 0 && index < instance.runtimeBackgroundClips.Count)
+                clip = instance.runtimeBackgroundClips[index];
+            else
+            {
+                int builtInIndex = index - instance.runtimeBackgroundClips.Count;
+                AudioClip[] built = instance.soundList[(int)SoundType.BACKGROUNDMUSIC].Sounds;
+                if (built != null && builtInIndex >= 0 && builtInIndex < built.Length)
+                    clip = built[builtInIndex];
+            }
+
+            if (clip == null) return -1;
+            return PlayBackgroundMusicClip(clip, loop, volume);
+        }
+
+        /// <summary>
+        /// Play a specific AudioClip as background music on its own AudioSource. Returns player id.
+        /// </summary>
+        public static int PlayBackgroundMusicClip(AudioClip clip, bool loop = true, float volume = 1f)
+        {
+            if (instance == null || clip == null) return -1;
+            int id = instance.nextBgMusicId++;
+            GameObject go = new GameObject($"BGMusic_{id}");
+            go.transform.SetParent(instance.transform);
+            var src = go.AddComponent<AudioSource>();
+            src.clip = clip;
+            src.loop = loop;
+            src.volume = volume;
+            src.spatialBlend = 0f; // 2D music
+            src.playOnAwake = false;
+            src.Play();
+            instance.backgroundMusicPlayers[id] = src;
+            return id;
+        }
+
+        /// <summary>
+        /// Stop and remove a runtime background music player by id
+        /// </summary>
+        public static void StopBackgroundMusicById(int id)
+        {
+            if (instance == null) return;
+            if (instance.backgroundMusicPlayers.TryGetValue(id, out var src))
+            {
+                if (src != null) src.Stop();
+                if (src != null) Destroy(src.gameObject);
+                instance.backgroundMusicPlayers.Remove(id);
+            }
+        }
+
+        /// <summary>
+        /// Stop all runtime background music players (keeps legacy audioSource untouched)
+        /// </summary>
+        public static void StopAllRuntimeBackgroundMusic()
+        {
+            if (instance == null) return;
+            var keys = new List<int>(instance.backgroundMusicPlayers.Keys);
+            foreach (var k in keys) StopBackgroundMusicById(k);
+        }
+
+        /// <summary>
+        /// Add/remove runtime background clips (these are considered before built-in BACKGROUNDMUSIC when using PlayBackgroundMusicByIndex)
+        /// </summary>
+        public static int AddRuntimeBackgroundClip(AudioClip clip)
+        {
+            if (instance == null || clip == null) return -1;
+            instance.runtimeBackgroundClips.Add(clip);
+            return instance.runtimeBackgroundClips.Count - 1;
+        }
+
+        public static bool RemoveRuntimeBackgroundClip(AudioClip clip)
+        {
+            if (instance == null || clip == null) return false;
+            return instance.runtimeBackgroundClips.Remove(clip);
         }
 
         /// <summary>
