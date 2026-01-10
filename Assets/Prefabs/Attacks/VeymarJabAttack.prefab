@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7596255602084651476}
   - component: {fileID: 4656294134895503253}
   m_Layer: 0
-  m_Name: VeymarBasicAttack
+  m_Name: VeymarJabAttack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44,17 +44,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3578d914d47a66e4f9863825179af65c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackRadius: 2
-  damageDelay: 1.7
+  attackRadius: 2.85
+  damageDelay: 1.5
   damageAmount: 10
-  playParticleOnAttack: 1
-  particleType: 10
-  particleSpawnOffset: {x: 0, y: 3, z: 0}
+  playParticleOnStartAttack: 1
+  playParticleOnEndAttack: 1
+  particleType: 6
+  particleType2: 13
+  particleSpawnOffset: {x: 0, y: 2, z: 0}
   playAudioOnStartAttack: 1
   playAudioOnEndAttack: 1
-  audioType: 13
-  audioType2: 3
-  audioVolume: 0.1
-  audioVolume2: 0.8
-  particleAndOrAudioPlayDelay: 0.05
-  particleAndOrAudioPlayDelay2: 1
+  audioType: 22
+  audioType2: 21
+  audioVolume: 0.3
+  audioVolume2: 0.6
+  particleAndOrAudioPlayDelay: 0.4
+  particleAndOrAudioPlayDelay2: 0.85

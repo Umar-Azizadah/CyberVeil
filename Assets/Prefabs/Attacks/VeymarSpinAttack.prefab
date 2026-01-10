@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7596255602084651476}
-  - component: {fileID: 3645584321673641295}
+  - component: {fileID: 4656294134895503253}
   m_Layer: 0
-  m_Name: GolemSlam 1
+  m_Name: VeymarSpinAttack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32,7 +32,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3645584321673641295
+--- !u!114 &4656294134895503253
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -44,17 +44,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3578d914d47a66e4f9863825179af65c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackRadius: 4
-  damageDelay: 1.9
+  attackRadius: 2
+  damageDelay: 1.5
   damageAmount: 10
-  playParticleOnAttack: 1
-  particleType: 9
-  particleSpawnOffset: {x: 0, y: 0, z: 0}
+  playParticleOnStartAttack: 1
+  playParticleOnEndAttack: 1
+  particleType: 10
+  particleType2: 11
+  particleSpawnOffset: {x: 0, y: 3, z: 0}
   playAudioOnStartAttack: 1
   playAudioOnEndAttack: 1
-  audioType: 16
-  audioType2: 15
+  audioType: 20
+  audioType2: 3
   audioVolume: 0.1
-  audioVolume2: 0.5
-  particleAndOrAudioPlayDelay: 0.8
-  particleAndOrAudioPlayDelay2: 0.7
+  audioVolume2: 0.6
+  particleAndOrAudioPlayDelay: 0.4
+  particleAndOrAudioPlayDelay2: 1.4

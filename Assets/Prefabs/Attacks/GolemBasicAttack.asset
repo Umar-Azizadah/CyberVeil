@@ -10,10 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 183b21f76dd8af74295b10c6a608e939, type: 3}
-  m_Name: GolemAttack 1
+  m_Name: GolemBasicAttack
   m_EditorClassIdentifier: 
-  attackName: Slam
-  attackRange: 3
-  cooldown: 4
-  attackDuration: 1
-  attackPrefab: {fileID: 4861171009482819011, guid: afd2db33351b2424cb02bc41d43780d0, type: 3}
+  attackName: Golem Basic Attack
+  attackRange: 1.5
+  cooldown: 3
+  attackDuration: 0.3
+  attackPrefab: {fileID: 4861171009482819011, guid: d8f9b7d4c812c354fb80102c600f24c1, type: 3}
+  attackAnimationStateName: Hit

@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 183b21f76dd8af74295b10c6a608e939, type: 3}
-  m_Name: VeymarBasicAttack
+  m_Name: GolemSlam
   m_EditorClassIdentifier: 
-  attackName: Basic Attack
+  attackName: Slam
   attackRange: 3
-  cooldown: 1.5
+  cooldown: 4
   attackDuration: 1
-  attackPrefab: {fileID: 4861171009482819011, guid: 09852272715426d4a9b56286209877a6, type: 3}
+  attackPrefab: {fileID: 4861171009482819011, guid: 00ac31d0dd745be428a2acffa9ffa5b4, type: 3}
