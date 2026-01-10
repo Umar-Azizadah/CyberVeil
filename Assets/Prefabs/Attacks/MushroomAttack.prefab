@@ -47,8 +47,10 @@ MonoBehaviour:
   attackRadius: 1.5
   damageDelay: 0.8
   damageAmount: 10
-  playParticleOnAttack: 1
+  playParticleOnStartAttack: 1
+  playParticleOnEndAttack: 0
   particleType: 11
+  particleType2: 3
   particleSpawnOffset: {x: 0, y: 1.5, z: 1}
   playAudioOnStartAttack: 1
   playAudioOnEndAttack: 0

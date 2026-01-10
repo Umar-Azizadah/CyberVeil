@@ -47,7 +47,17 @@ MonoBehaviour:
   leapForce: 3.5
   leapHeight: 2
   leapDuration: 0.4
-  leapVol: 0.4
-  splatVol: 0.6
+  playParticleOnAttack: 1
+  particleType: 6
+  particleSpawnOffset: {x: 0, y: 0, z: 0}
+  playAudioOnStartAttack: 1
+  playAudioOnEndAttack: 1
+  audioType: 18
+  audioType2: 19
+  audioVolume: 0.4
+  audioVolume2: 0.6
+  particleAndOrAudioPlayDelay: 0.3
+  particleAndOrAudioPlayDelay2: 0.5
   damageRadius: 2
+  damageDelay: 1
   damageAmount: 20

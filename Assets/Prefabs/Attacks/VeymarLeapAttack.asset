@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 183b21f76dd8af74295b10c6a608e939, type: 3}
   m_Name: VeymarLeapAttack
   m_EditorClassIdentifier: 
-  attackName: Slime Leap Attack
+  attackName: Veymar Leap Attack
   attackRange: 6
   cooldown: 8
-  attackDuration: 1
+  attackDuration: 2
   attackPrefab: {fileID: 4861171009482819011, guid: 27257a111d8d13845be99a17fe21ec32, type: 3}
+  attackAnimationStateName: LeapAttack
