@@ -2,6 +2,7 @@ using CyberVeil.Core;
 using CyberVeil.UI;
 using System.Collections;
 using UnityEngine;
+using CyberVeil.Systems;
 using static UnityEngine.Rendering.ProbeAdjustmentVolume;
 
 namespace CyberVeil.World
@@ -17,6 +18,8 @@ namespace CyberVeil.World
         [SerializeField] private string portalName = "Upgrade Portal";
         [SerializeField] private string prompt = "Upgrade";
         public string Prompt => prompt;
+
+        private NameTag nameTag;
 
         private Coroutine flow;
 
@@ -36,6 +39,16 @@ namespace CyberVeil.World
             flow = StartCoroutine(RunInteraction(interactor));
         }
 
+        private void Awake()
+        {
+            // Cache optional name tag if present on the prefab and initialize it
+            nameTag = GetComponentInChildren<NameTag>(true);
+            if (nameTag != null)
+            {
+                nameTag.Show(false);
+            }
+        }
+
         [System.Obsolete]
         /// <summary>
         /// Coroutine that shows the upgrade menu and waits until it closes
@@ -44,9 +57,9 @@ namespace CyberVeil.World
         {
             // Start a cinematic hold on the portal and keep it active while the upgrade menu is open
             bool holdStarted = false;
-            if (CyberVeil.Systems.CinematicCamera.Instance != null)
+            if (CinematicCamera.Instance != null)
             {
-                CyberVeil.Systems.CinematicCamera.Instance.StartHoldFocus(transform);
+                CinematicCamera.Instance.StartHoldFocus(transform);
                 holdStarted = true;
             }
 
@@ -62,9 +75,9 @@ namespace CyberVeil.World
             }
             finally
             {
-                if (holdStarted && CyberVeil.Systems.CinematicCamera.Instance != null)
+                if (holdStarted && CinematicCamera.Instance != null)
                 {
-                    CyberVeil.Systems.CinematicCamera.Instance.EndHoldFocus();
+                    CinematicCamera.Instance.EndHoldFocus();
                 }
             }
 
@@ -74,7 +87,11 @@ namespace CyberVeil.World
             flow = null;
         }
 
-        public void OnFocus(IInteractor interactor) { /* add future visuals? */ }
-        public void OnDefocus(IInteractor interactor) { /* add future visuals? */ }
+        public void OnFocus(IInteractor interactor) {
+            if (nameTag != null) nameTag.Show(true);
+        }
+        public void OnDefocus(IInteractor interactor) {
+            if (nameTag != null) nameTag.Show(false); 
+        }
     }
 }

@@ -2,6 +2,7 @@ using CyberVeil.Core;
 using CyberVeil.UI;
 using System.Collections;
 using UnityEngine;
+using CyberVeil.Systems;
 
 namespace CyberVeil.World
 {
@@ -31,6 +32,7 @@ namespace CyberVeil.World
         [SerializeField] private float autoAdvanceSeconds = 4f;
 
         private Coroutine convo;
+        private NameTag nameTag;
 
         [System.Obsolete]
         /// <summary>
@@ -44,7 +46,24 @@ namespace CyberVeil.World
             var promptUI = FindObjectOfType<InteractPromptUI>(true);
             if (promptUI) promptUI.gameObject.SetActive(false);
 
+            // Start cinematic hold while NPC speaks
+            if (CinematicCamera.Instance != null)
+            {
+                CinematicCamera.Instance.StartHoldFocus(transform);
+            }
+
             convo = StartCoroutine(RunConversation(interactor));
+        }
+
+        private void Awake()
+        {
+            // Cache optional name tag if present on the prefab and ensure it's initialized with this objects name
+            nameTag = GetComponentInChildren<NameTag>(true);
+            if (nameTag != null)
+            {
+                nameTag.SetName(npcName);
+                nameTag.Show(false);
+            }
         }
 
         [System.Obsolete]
@@ -64,10 +83,24 @@ namespace CyberVeil.World
             var promptUI = FindObjectOfType<InteractPromptUI>(true);
             if (promptUI) promptUI.gameObject.SetActive(true);
             
+            // End cinematic hold when conversation finishes
+            if (CinematicCamera.Instance != null)
+            {
+                CinematicCamera.Instance.EndHoldFocus();
+            }
+
             convo = null;
         }
 
-        public void OnFocus(IInteractor interactor) { /* add future visuals? */ }
-        public void OnDefocus(IInteractor interactor) { /* add future visuals?*/ }
+        public void OnFocus(IInteractor interactor)
+        {
+            // Show the world-space name tag when the player focuses this NPC
+            if (nameTag != null) nameTag.Show(true);
+        }
+
+        public void OnDefocus(IInteractor interactor)
+        {
+            if (nameTag != null) nameTag.Show(false);
+        }
     }
 }
