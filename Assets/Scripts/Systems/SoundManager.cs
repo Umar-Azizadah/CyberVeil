@@ -23,8 +23,14 @@ namespace CyberVeil.Systems
         CARDHOVER,
         CARDCLICK,
         CARDCYBER,
-        GROUNDSLAMNOISE,
+        GROUNDSLAM1,
         WINDUP,
+        MULTISLASHES,
+        WHOOSH,
+        GROUNDSLAM2,
+        CHARGEUP,
+        JABHIT,
+        JABTHRUST,
     }
 
     // Ensures an audio source is on the game object and lets the script run in the editor
@@ -49,25 +55,24 @@ namespace CyberVeil.Systems
         private AudioSource audioSource; // Used for background music 
         private AudioSource footstepAudioSource; // Dedicated audio source for footsteps
         private AudioSource sfxAudioSource;// Uses one-shot SFX
-    // Runtime-managed background music players (allow multiple simultaneous tracks)
-    private Dictionary<int, AudioSource> backgroundMusicPlayers = new Dictionary<int, AudioSource>();
-    private List<AudioClip> runtimeBackgroundClips = new List<AudioClip>();
-    private int nextBgMusicId = 1;
+        // Runtime-managed background music players (allow multiple simultaneous tracks)
+        private Dictionary<int, AudioSource> backgroundMusicPlayers = new Dictionary<int, AudioSource>();
+        private List<AudioClip> runtimeBackgroundClips = new List<AudioClip>();
+        private int nextBgMusicId = 1;
 
         private void Awake()
         {
             // Enforce singleton: if another SoundManager exists, destroy this duplicate
             if (instance != null && instance != this)
             {
-                // If you prefer to keep a single SoundManager across scenes, consider using DontDestroyOnLoad on the original.
                 Destroy(gameObject);
                 return;
             }
 
             instance = this;
 
-            // Ensure we have a dedicated SFX AudioSource. There will always be at least one AudioSource due to RequireComponent,
-            // so reuse an existing second AudioSource if present, otherwise create one.
+            // Ensure have a dedicated SFX AudioSource, there will always be at least one AudioSource due to RequireComponent,
+            // so reuse an existing second AudioSource if present, otherwise create one
             var existingAudioSources = GetComponents<AudioSource>();
             if (existingAudioSources.Length > 1)
             {
