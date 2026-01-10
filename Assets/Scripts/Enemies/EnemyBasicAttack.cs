@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using CyberVeil.Combat;
 using CyberVeil.VFX;
+using CyberVeil.Systems;
 
 namespace CyberVeil.Enemies
 {
@@ -17,13 +18,15 @@ namespace CyberVeil.Enemies
         [SerializeField] private int damageAmount = 10;
 
          [Header("Optional VFX & Audio")]
-        [SerializeField] private bool playParticleOnAttack = false;
+        [SerializeField] private bool playParticleOnStartAttack = false;
+        [SerializeField] private bool playParticleOnEndAttack = false;
         [SerializeField] private VFXType particleType = VFXType.SlashHit;
+        [SerializeField] private VFXType particleType2 = VFXType.SlashHit;
         [SerializeField] private Vector3 particleSpawnOffset = Vector3.zero;
         [SerializeField] private bool playAudioOnStartAttack = false;
         [SerializeField] private bool playAudioOnEndAttack = false;
-        [SerializeField] private Systems.SoundType audioType = Systems.SoundType.ATTACK;
-        [SerializeField] private Systems.SoundType audioType2 = Systems.SoundType.ATTACK;
+        [SerializeField] private SoundType audioType = SoundType.ATTACK;
+        [SerializeField] private SoundType audioType2 = SoundType.ATTACK;
         [SerializeField] private float audioVolume = 0.5f;
         [SerializeField] private float audioVolume2 = 0.5f;
         [SerializeField] private float particleAndOrAudioPlayDelay = 0.5f;
@@ -45,20 +48,25 @@ namespace CyberVeil.Enemies
             if (particleAndOrAudioPlayDelay > 0f)
                 yield return new WaitForSeconds(particleAndOrAudioPlayDelay);
 
-            if (playParticleOnAttack && ParticleManager.Instance != null)
+            if (playAudioOnStartAttack && ParticleManager.Instance != null)
             {
                 Vector3 spawnPos = transform.position + particleSpawnOffset;
                 ParticleManager.Instance.PlayEffect(particleType, spawnPos, transform.rotation);
             }
             if (playAudioOnStartAttack)
             {
-                Systems.SoundManager.PlaySound(audioType, audioVolume);
+                SoundManager.PlaySound(audioType, audioVolume);
             }
 
             if (playAudioOnEndAttack)
             {
                 yield return new WaitForSeconds(particleAndOrAudioPlayDelay2);
-                Systems.SoundManager.PlaySound(audioType2, audioVolume);
+                SoundManager.PlaySound(audioType2, audioVolume2);
+            }
+            if (playAudioOnEndAttack && ParticleManager.Instance != null)
+            {
+                Vector3 spawnPos = transform.position + particleSpawnOffset;
+                ParticleManager.Instance.PlayEffect(particleType2, spawnPos, transform.rotation);
             }
         }
 
@@ -81,8 +89,8 @@ namespace CyberVeil.Enemies
             CombatManager.Instance.DealDamageInRadius(transform.position, attackRadius, damageAmount, transform.root.gameObject);
         }
 
-            // Animation events in Unity cannot directly start coroutines that return IEnumerator.
-            // Use this wrapper if you want to call the attack from an AnimationEvent on the enemy's Animator.
+            // Animation events in Unity cannot directly start coroutines that return IEnumerator
+            // Use this wrapper if you want to call the attack from an AnimationEvent on the enemy's Animator
             public void TriggerExecuteAttack()
             {
                 StartCoroutine(ExecuteAttack());
