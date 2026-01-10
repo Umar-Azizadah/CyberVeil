@@ -33,3 +33,28 @@ Thumbs.db
 # Unity builds
 GameBuild/
 NewGameBuild/
+# Unity/VS generated
+Library/
+Logs/
+Temp/
+Obj/
+obj/
+UserSettings/
+.vs/
+.DS_Store
+
+# Builds
+GameBuild/
+NewGameBuild/
+Build/
+Builds/
+[Bb]uild*/
+
+# C# build artifacts
+[Bb]in/
+[Oo]bj/
+Assets/**/bin/
+Assets/**/obj/
+
+# Archives
+*.zip
