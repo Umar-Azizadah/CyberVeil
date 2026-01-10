@@ -345,7 +345,7 @@ Material:
     - _FirstShadeVisible: 1
     - _GI_Intensity: 0
     - _GlossMapScale: 0
-    - _Glossiness: 2
+    - _Glossiness: 3.2
     - _GlossyReflections: 0
     - _HeightAmplitude: 0.02
     - _HeightCenter: 0.5

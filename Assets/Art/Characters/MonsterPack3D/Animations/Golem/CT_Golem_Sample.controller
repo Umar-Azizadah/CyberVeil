@@ -174,10 +174,10 @@ AnimatorStateMachine:
     m_Position: {x: 310, y: 60, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 7666523963822004960}
-    m_Position: {x: 510, y: 260, z: 0}
+    m_Position: {x: 290, y: 250, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 5150696685297385489}
-    m_Position: {x: 290, y: 260, z: 0}
+    m_Position: {x: 520, y: 240, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -3624171029182447955}
     m_Position: {x: 290, y: 190, z: 0}
@@ -283,7 +283,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: SA_Golem_Hammer
+  m_Name: Hit
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -296,7 +296,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 93bbb9d463f2d484d855af91d826c40e, type: 2}
+  m_Motion: {fileID: 7400000, guid: e7ff247fdcd69a9478eaae7fdf72de80, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
