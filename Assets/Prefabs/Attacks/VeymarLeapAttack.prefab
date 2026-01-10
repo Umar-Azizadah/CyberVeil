@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7596255602084651476}
   - component: {fileID: -1389945211738966557}
   m_Layer: 0
-  m_Name: Leap Attack
+  m_Name: VeymarLeapAttack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44,10 +44,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db1177470f2eee742950a2fd61857f42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  leapForce: 5
+  leapForce: 3.5
   leapHeight: 2
   leapDuration: 0.4
   leapVol: 0.4
   splatVol: 0.6
   damageRadius: 2
-  damageAmount: 25
+  damageAmount: 20

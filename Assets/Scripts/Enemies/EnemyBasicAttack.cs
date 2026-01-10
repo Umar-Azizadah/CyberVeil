@@ -16,12 +16,50 @@ namespace CyberVeil.Enemies
         [SerializeField] private float damageDelay = 1f; // Delay before damage is applied (synced with animation)e
         [SerializeField] private int damageAmount = 10;
 
+         [Header("Optional VFX & Audio")]
+        [SerializeField] private bool playParticleOnAttack = false;
+        [SerializeField] private VFXType particleType = VFXType.SlashHit;
+        [SerializeField] private Vector3 particleSpawnOffset = Vector3.zero;
+        [SerializeField] private bool playAudioOnStartAttack = false;
+        [SerializeField] private bool playAudioOnEndAttack = false;
+        [SerializeField] private Systems.SoundType audioType = Systems.SoundType.ATTACK;
+        [SerializeField] private Systems.SoundType audioType2 = Systems.SoundType.ATTACK;
+        [SerializeField] private float audioVolume = 0.5f;
+        [SerializeField] private float audioVolume2 = 0.5f;
+        [SerializeField] private float particleAndOrAudioPlayDelay = 0.5f;
+        [SerializeField] private float particleAndOrAudioPlayDelay2 = 0.5f;
+
         private IAttackEffect visualEffect;
 
         private void Start()
         {
             // Check for an optional VFX effect on this object or any child (some enemies keep VFX on a child object)
             visualEffect = GetComponent<IAttackEffect>() ?? GetComponentInChildren<IAttackEffect>();
+
+            // Kick off delayed one-shot particle/audio at spawn if desired
+            StartCoroutine(PlaySpawnEffectsAfterDelay());
+        }
+
+        private IEnumerator PlaySpawnEffectsAfterDelay()
+        {
+            if (particleAndOrAudioPlayDelay > 0f)
+                yield return new WaitForSeconds(particleAndOrAudioPlayDelay);
+
+            if (playParticleOnAttack && ParticleManager.Instance != null)
+            {
+                Vector3 spawnPos = transform.position + particleSpawnOffset;
+                ParticleManager.Instance.PlayEffect(particleType, spawnPos, transform.rotation);
+            }
+            if (playAudioOnStartAttack)
+            {
+                Systems.SoundManager.PlaySound(audioType, audioVolume);
+            }
+
+            if (playAudioOnEndAttack)
+            {
+                yield return new WaitForSeconds(particleAndOrAudioPlayDelay2);
+                Systems.SoundManager.PlaySound(audioType2, audioVolume);
+            }
         }
 
         /// <summary>
@@ -37,6 +75,7 @@ namespace CyberVeil.Enemies
             {
                 yield return new WaitForSeconds(damageDelay); // Fallback if no visual
             }
+
 
             // Applies damage to player
             CombatManager.Instance.DealDamageInRadius(transform.position, attackRadius, damageAmount, transform.root.gameObject);

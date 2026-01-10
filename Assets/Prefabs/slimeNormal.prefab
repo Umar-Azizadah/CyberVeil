@@ -2670,6 +2670,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 1
   detectionRange: 9
+  strafeChance: 0.03
+  strafeCooldown: 3
+  strafeMinDistance: 1.5
+  strafeMaxDistance: 6
   lastAttackTime: -999
   currentAIState: 0
 --- !u!95 &2574363053588853092
@@ -2904,6 +2908,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6f3d1f6eebdbb24f978fa4b5d8dc480, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  staggerChance: 0.848
 --- !u!114 &5977844391970981095
 MonoBehaviour:
   m_ObjectHideFlags: 0

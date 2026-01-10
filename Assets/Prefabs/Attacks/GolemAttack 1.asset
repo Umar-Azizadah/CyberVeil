@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 183b21f76dd8af74295b10c6a608e939, type: 3}
-  m_Name: ShieldLumge
+  m_Name: GolemAttack 1
   m_EditorClassIdentifier: 
-  attackName: shieldlunge
-  attackRange: 2
-  cooldown: 1
-  attackPrefab: {fileID: 0}
+  attackName: Slam
+  attackRange: 3
+  cooldown: 4
+  attackDuration: 1
+  attackPrefab: {fileID: 4861171009482819011, guid: afd2db33351b2424cb02bc41d43780d0, type: 3}
