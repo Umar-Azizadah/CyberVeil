@@ -177,6 +177,19 @@ namespace CyberVeil.Enemies
                     // Prefab-based attack (used by most enemies)
                     GameObject attackInstance = Instantiate(currentAttack.attackPrefab, transform.position, Quaternion.identity, transform);
                     IEnemyAttack attackLogic = attackInstance.GetComponent<IEnemyAttack>();
+                    
+                    // Play attack-specific animation if assigned, otherwise generic Attack
+                    Animator animator = characterStateMachine.GetComponent<Animator>();
+                    if (!string.IsNullOrEmpty(currentAttack.attackAnimationStateName))
+                    {
+                        animator.CrossFade(Animator.StringToHash(currentAttack.attackAnimationStateName), 0.1f, 0);
+                    }
+                    else
+                    {
+                        // Fallback to generic Attack state
+                        animator.CrossFade(Animator.StringToHash("Attack"), 0.1f, 0);
+                    }
+
                     if (attackLogic != null)
                         yield return StartCoroutine(attackLogic.ExecuteAttack());
 

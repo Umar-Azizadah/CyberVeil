@@ -17,5 +17,8 @@ namespace CyberVeil.Enemies
         public float attackDuration = 1f;
 
         public GameObject attackPrefab; // prefab contatining an IEnemyAttack component to execute
+        [Header("Animation")]
+        [Tooltip("Animation state name in the Animator Controller (e.g., 'BasicAttack', 'LeapAttack'). Leave empty to use generic 'Attack' state")]
+        public string attackAnimationStateName;
     }
 }
