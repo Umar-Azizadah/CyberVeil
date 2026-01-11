@@ -22,14 +22,52 @@ namespace CyberVeil.Combat
         // Public readonly to expose private fields
         public float Normalized => GetEffectiveMax() > 0 ? (float)currentHealth / GetEffectiveMax() : 0f; // Returns health as a percentage for use in UI
 
+        private int lastKnownMax; // Track previous max to detect upgrades
+
         private void Awake()
         {
-           currentHealth = GetEffectiveMax();; // Sets health to max at start      
+           lastKnownMax = GetEffectiveMax();
+           currentHealth = lastKnownMax; // Sets health to max at start
+
+           // Subscribe to player stat changes if this is the player
+           if (faction == Faction.Player)
+           {
+               var mods = PlayerStatsUpgradeManager.Instance;
+               if (mods != null)
+                   mods.OnChanged += HandleStatsUpgraded;
+           }
         }
 
         private void OnEnable()
         {
             OnHealthChanged?.Invoke(this); // Broadcast initial state so UI is correct at game start
+        }
+
+        private void OnDestroy()
+        {
+            // Unsubscribe to prevent memory leaks
+            if (faction == Faction.Player)
+            {
+                var mods = PlayerStatsUpgradeManager.Instance;
+                if (mods != null)
+                    mods.OnChanged -= HandleStatsUpgraded;
+            }
+        }
+
+        /// <summary>
+        /// When player stats are upgraded, scale current health proportionally
+        /// </summary>
+        private void HandleStatsUpgraded()
+        {
+            int newMax = GetEffectiveMax();
+            if (newMax != lastKnownMax && lastKnownMax > 0)
+            {
+                // Scale current health proportionally: if you had 50/100, now you have 60/120
+                float healthPercent = (float)currentHealth / lastKnownMax;
+                currentHealth = Mathf.RoundToInt(newMax * healthPercent);
+                lastKnownMax = newMax;
+                OnHealthChanged?.Invoke(this);
+            }
         }
 
         /// <summary>
@@ -74,6 +112,9 @@ namespace CyberVeil.Combat
 
         private void Die()
         {
+            var enemyAudio = GetComponent<Enemies.EnemyAudio>();
+            enemyAudio?.PlayDeath();
+
             Destroy(gameObject); //simple death logic
         }
     }

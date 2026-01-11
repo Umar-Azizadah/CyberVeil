@@ -13,7 +13,13 @@ namespace CyberVeil.UI
         [SerializeField] private RectTransform bar; // UI slice that acttually shrinks or grows
         [Range(0f, 30f)] public float smoothSpeed = 12f;
 
-        private float currentFill = 1f, targetFill = 1f; // What the bar shows right now and what the bar is supposed to be at [0..1] percentage
+        [Header("Visual Range Calibration")]
+        [Tooltip("Health bar width fraction when health is 0% (empty). If your bar looks empty at 0.45, set this to 0.45.")]
+        [Range(0f, 1f)] public float visualEmpty = 0.45f;
+        [Tooltip("Health bar width fraction when health is 100% (full).")]
+        [Range(0f, 1f)] public float visualFull = 1f;
+
+       [SerializeField] private float currentFill = 1f, targetFill = 1f; // What the bar shows right now and what the bar is supposed to be at [0..1] percentage
         private float initialWidth;
 
         private void OnEnable()
@@ -65,8 +71,11 @@ namespace CyberVeil.UI
         {
             fill01 = Mathf.Clamp01(fill01); // Clamps the input so it never goes below 0 or above 1
 
-            // Resizes the bar to the correct width (in whole pixels), based on health percent � initial width
-            float widthPx = Mathf.Round(fill01 * initialWidth);
+            // Map health (0→1) to visual range (visualEmpty→visualFull)
+            float visualFill = Mathf.Lerp(visualEmpty, visualFull, fill01);
+
+            // Resizes the bar to the correct width (in whole pixels), based on visual percent × initial width
+            float widthPx = Mathf.Round(visualFill * initialWidth);
             bar.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, widthPx);
         }
     }
