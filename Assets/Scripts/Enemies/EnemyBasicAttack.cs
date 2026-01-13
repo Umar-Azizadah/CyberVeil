@@ -18,13 +18,12 @@ namespace CyberVeil.Enemies
         [SerializeField] private int damageAmount = 10;
 
          [Header("Optional VFX & Audio")]
-        [SerializeField] private bool playParticleOnStartAttack = false;
-        [SerializeField] private bool playParticleOnEndAttack = false;
         [SerializeField] private VFXType particleType = VFXType.SlashHit;
         [SerializeField] private VFXType particleType2 = VFXType.SlashHit;
         [SerializeField] private Vector3 particleSpawnOffset = Vector3.zero;
         [SerializeField] private bool playAudioOnStartAttack = false;
         [SerializeField] private bool playAudioOnEndAttack = false;
+         [SerializeField] private bool playSecondParticle = true;
         [SerializeField] private SoundType audioType = SoundType.ATTACK;
         [SerializeField] private SoundType audioType2 = SoundType.ATTACK;
         [SerializeField] private float audioVolume = 0.5f;
@@ -63,7 +62,7 @@ namespace CyberVeil.Enemies
                 yield return new WaitForSeconds(particleAndOrAudioPlayDelay2);
                 SoundManager.PlaySound(audioType2, audioVolume2);
             }
-            if (playAudioOnEndAttack && ParticleManager.Instance != null)
+            if (playSecondParticle && ParticleManager.Instance != null)
             {
                 Vector3 spawnPos = transform.position + particleSpawnOffset;
                 ParticleManager.Instance.PlayEffect(particleType2, spawnPos, transform.rotation);

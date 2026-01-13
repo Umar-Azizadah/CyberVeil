@@ -19,17 +19,13 @@ namespace CyberVeil.Enemies
         [SerializeField] private float leapDuration = 0.4f;
 
          [Header("Optional VFX & Audio")]
-        [SerializeField] private bool playParticleOnAttack = false;
         [SerializeField] private VFXType particleType = VFXType.SlimeSplat;
-        [SerializeField] private Vector3 particleSpawnOffset = Vector3.zero;
-        [SerializeField] private bool playAudioOnStartAttack = false;
-        [SerializeField] private bool playAudioOnEndAttack = false;
         [SerializeField] private SoundType audioType = SoundType.ATTACK;
         [SerializeField] private SoundType audioType2 = SoundType.ATTACK;
         [SerializeField] private float audioVolume = 0.4f;
         [SerializeField] private float audioVolume2 = 0.6f;
         [SerializeField] private float particleAndOrAudioPlayDelay = 0.3f;
-        [SerializeField] private float particleAndOrAudioPlayDelay2 = 0.5f;
+
 
         [Header("Attack Settings")]
         [SerializeField] private float damageRadius = 2f;
