@@ -31,6 +31,21 @@ namespace CyberVeil.Systems
         CHARGEUP,
         JABHIT,
         JABTHRUST,
+        MUSHROOMWHOOSH,
+        MUSHROOMAMBIENT1,
+        MUSHROOMAMBIENT2,
+        SLIMEAMBIENT1,
+        ENEMYSPAWN,
+        ENEMYDEATH,
+        GOLEMAMBIENT1,
+        GOLEMAMBIENT2,
+        VEYMARAMBIENT1,
+        VEYMARAMBIENT2,
+        VEYMARAMBIENT3,
+        VEYMARTALK,
+        VEILSURGEACTIVATION,
+        VEILSURGEACTIVE,
+
     }
 
     // Ensures an audio source is on the game object and lets the script run in the editor
