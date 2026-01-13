@@ -22,7 +22,7 @@ namespace CyberVeil.VFX
         AOESlash,
         MushroomHit,
         JabHit,
-
+        VeilSurgeActivation,
         
     }
 

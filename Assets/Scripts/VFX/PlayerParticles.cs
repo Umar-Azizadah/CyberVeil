@@ -2,15 +2,15 @@ using UnityEngine;
 
 namespace CyberVeil.VFX
 {
-    public class dustParticle : MonoBehaviour
+    public class PlayerParticles : MonoBehaviour
     {
 
-        public void ShowDustParticle()
+        public void ShowParticle()
         {
             gameObject.SetActive(true); //enable the GameObject
         }
 
-        public void HideDustParticle()
+        public void HideParticle()
         {
             gameObject.SetActive(false); //disable the GameObject
         }
