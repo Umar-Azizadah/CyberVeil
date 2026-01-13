@@ -36,6 +36,7 @@ namespace CyberVeil.Player
         public SlashAttack2 slash2;
         public SlashAttack3 slash3;
 
+        private VeilSurgeSkill veilSurgeSkill;
         [SerializeField] private MonoBehaviour attackGateBehaviour;
         private IAttackGate attackGate;
         private PlayerController playerController;
@@ -46,7 +47,7 @@ namespace CyberVeil.Player
             playerController = GetComponent<PlayerController>();
             stateMachine = GetComponent<CharacterStateMachine>();
             attackGate = GetComponent<AttackLimiterMechanic>();
-
+            veilSurgeSkill = GetComponent<VeilSurgeSkill>();
 
             toggleAxe.HideAxe();
             toggleAxe2.HideAxe2();
@@ -60,8 +61,12 @@ namespace CyberVeil.Player
                 || !Mouse.current.leftButton.wasPressedThisFrame)
                 return;
 
-            // Limiter check
-            if (attackGate != null && !attackGate.CanStartAttack)
+            // Limiter check (bypass if offensive skill active)
+            if (veilSurgeSkill != null && veilSurgeSkill.ShouldBypassAttackLocking)
+            {
+                // During offensive boost, ignore attack locking
+            }
+            else if (attackGate != null && !attackGate.CanStartAttack)
             {
                 SoundManager.PlaySound(SoundType.ATTACKLOCK, 0.6f); 
                 return; 
@@ -133,13 +138,20 @@ namespace CyberVeil.Player
             attackComboCount++;
             canAttack = false;
 
+            // Get attack speed multiplier from skill
+            float attackCooldownMultiplier = 1f;
+            if (veilSurgeSkill != null && veilSurgeSkill);
+            {
+                attackCooldownMultiplier = 1f / veilSurgeSkill.GetAttackSpeedMultiplier();
+            }
+
             if (attackComboCount != 3)
             {
-                Invoke(nameof(ResetAttackCooldown), attackCooldown);
+                Invoke(nameof(ResetAttackCooldown), attackCooldown * attackCooldownMultiplier);
             }
             else
             {
-                Invoke(nameof(ResetAttackCooldown), comboAttackCooldown);
+                Invoke(nameof(ResetAttackCooldown), comboAttackCooldown * attackCooldownMultiplier);
                 attackComboCount = 0;
                 attackMovementBoost = 30f;
                 playerController.speed = playerController.defaultSpeed;
