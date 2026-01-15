@@ -62,8 +62,8 @@ namespace CyberVeil.Systems
         }
 
         /// <summary>
-        /// Calls this after the player uses teleporter upgrade UI, (in future: teleports them to next scene/level)
-        /// Starts the next trials wave 1
+        /// Called after the player uses portal upgrade UI
+        /// Loads the next level scene via SceneProgressManager
         /// </summary>
         public void ContinueAfterUpgrade()
         {
@@ -71,14 +71,23 @@ namespace CyberVeil.Systems
 
             waitingForUpgrade = false;
 
-            // Move to next trial
-            trialIndex++;
-            waveIndex = 0;
-
-            if (trialIndex >= 3)
+            // Check if SceneProgressManager exists and load next level
+            if (SceneProgressManager.Instance != null)
             {
-                Debug.Log("All trials complete"); // Will figure something out later
-                return;
+                if (SceneProgressManager.Instance.HasNextLevel())
+                {
+                    Debug.Log("Loading next level after upgrade...");
+                    SceneProgressManager.Instance.LoadNextLevel();
+                }
+                else
+                {
+                    Debug.Log("All levels complete!");
+                    // You can add end-game logic here
+                }
+            }
+            else
+            {
+                Debug.LogWarning("SceneProgressManager not found! Cannot transition to next level.");
             }
         }
 
