@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackName: Veymar Spin Attack
   attackRange: 4
-  cooldown: 3
+  cooldown: 5
   attackDuration: 1.2
   attackPrefab: {fileID: 4861171009482819011, guid: 09852272715426d4a9b56286209877a6, type: 3}
   attackAnimationStateName: SpinAttack

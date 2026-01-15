@@ -17589,7 +17589,7 @@ MonoBehaviour:
   spawnVol: 0.12
   deathVol: 0.1
   ambientSounds: 1a000000
-  ambientVolume: 0.35
+  ambientVolume: 0.3
   ambientMinInterval: 4
   ambientMaxInterval: 8
   playSpawnOnEnable: 1

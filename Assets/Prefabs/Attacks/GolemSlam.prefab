@@ -46,14 +46,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackRadius: 4
   damageDelay: 1.9
-  damageAmount: 10
-  playParticleOnStartAttack: 1
-  playParticleOnEndAttack: 0
+  damageAmount: 42
   particleType: 9
   particleType2: 3
   particleSpawnOffset: {x: 0, y: 0, z: 0}
   playAudioOnStartAttack: 1
   playAudioOnEndAttack: 1
+  playSecondParticle: 0
   audioType: 16
   audioType2: 15
   audioVolume: 0.45

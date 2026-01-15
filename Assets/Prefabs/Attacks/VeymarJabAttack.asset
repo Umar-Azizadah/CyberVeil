@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackName: Veymar Jab Attack
   attackRange: 3.6
-  cooldown: 1.8
+  cooldown: 2
   attackDuration: 1.2
   attackPrefab: {fileID: 4861171009482819011, guid: f56b89510aaa28b4f9169ba2c6694382, type: 3}
   attackAnimationStateName: Attack
