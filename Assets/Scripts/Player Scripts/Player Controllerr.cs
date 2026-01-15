@@ -14,7 +14,6 @@ namespace CyberVeil.Player
     /// - Sprint ramp (visual/feel smoothing; does NOT change your sprint script)
     /// - Turn-boost on sharp direction changes (snappier melee movement)
     /// - Ground "stick" to reduce CharacterController floaty bumps
-    /// NOTE: Does not modify PlayerDash / PlayerSprint code. Those remain untouched.
     /// </summary>
     public class PlayerController : MonoBehaviour
     {
@@ -46,7 +45,7 @@ namespace CyberVeil.Player
         private Vector3 verticalVelocity;
 
         [Header("Components")]
-        public dustParticle dustParticle;
+        public PlayerParticles dustParticle;
         private Camera mainCamera;
         private CharacterController characterController;
         private PlayerDash playerDash;
@@ -73,6 +72,9 @@ namespace CyberVeil.Player
             playerAttack = GetComponent<PlayerAttack>();
             stateMachine = GetComponent<CharacterStateMachine>();
             speed = defaultSpeed;
+
+            // Initialize lastDirection to match the player's current facing direction
+            lastDirection = transform.forward;
         }
 
         private void Update()
@@ -106,11 +108,11 @@ namespace CyberVeil.Player
             if (dustParticle != null)
             {
                 if (cinematicActive)
-                    dustParticle.HideDustParticle();
+                    dustParticle.HideParticle();
                 else if (moveDirection.sqrMagnitude > 0.01f)
-                    dustParticle.ShowDustParticle();
+                    dustParticle.ShowParticle();
                 else
-                    dustParticle.HideDustParticle();
+                    dustParticle.HideParticle();
             }
         }
 

@@ -30,8 +30,15 @@ namespace CyberVeil.Player
 
         private void Awake()
         {
-            if (Instance && Instance != this) { Destroy(gameObject); return; }
+            if (Instance && Instance != this) 
+            { 
+                Destroy(gameObject); 
+                return; 
+            }
             Instance = this;
+            
+            // Persist this across scene loads to keep upgrades
+            DontDestroyOnLoad(gameObject);
         }
 
         // ---------------- READ API -----------------
