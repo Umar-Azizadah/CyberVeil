@@ -40,7 +40,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseMap:
-        m_Texture: {fileID: 10309, guid: 0000000000000000f000000000000000, type: 0}
+        m_Texture: {fileID: 2800000, guid: b27324627e60283479ab378059c40dec, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMap:
@@ -77,9 +77,9 @@ Material:
     - BOOLEAN_USE_WROLDSPACE: 0
     - BOOLEAN_WORLDORIGIN: 0
     - BOOLEAN_WROLDSPACE_OFFEST: 0
-    - _DierctionEdgeWidthScale: 2.24
-    - _EdgeColorIntensity: 3.55
-    - _EdgeWidth: 0.619
+    - _DierctionEdgeWidthScale: 1.7
+    - _EdgeColorIntensity: 1.5
+    - _EdgeWidth: 1
     - _Metallic: 0
     - _NoiseScale: 145.24
     - _NormalScale: 1
@@ -90,14 +90,14 @@ Material:
     - _UseSpecularMap: 0
     m_Colors:
     - Vector3_2E106ED0: {r: 90, g: 0, b: 0, a: 0}
-    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BaseColor: {r: 0.38866457, g: 0.28490567, b: 1, a: 1}
     - _DirectionFactor: {r: 90, g: 1.4, b: 0, a: 0}
-    - _DissolveDirection: {r: 90, g: 0, b: 0, a: 0}
+    - _DissolveDirection: {r: 100, g: 100, b: 0, a: 0}
     - _DissolveOffest: {r: 0, g: 0, b: 0, a: 0}
-    - _EdgeColor: {r: 2.2463293, g: 0, b: 2.6082375, a: 1}
+    - _EdgeColor: {r: 0.7745075, g: 0, b: 1, a: 1}
     - _NoiseUVSpeed: {r: 1, g: 1.27, b: 0, a: 0}
     - _Offest: {r: 0, g: 0, b: 0, a: 0}
-    - _SpecularColor: {r: 0, g: 0, b: 0, a: 0}
+    - _SpecularColor: {r: 1, g: 1, b: 1, a: 0}
     - _Tiling: {r: 1, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

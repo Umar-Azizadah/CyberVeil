@@ -6876,7 +6876,6 @@ MonoBehaviour:
   dashDuration: 0.2
   dashCooldown: 0.6
   dashVol: 0.5
-  dashParticles: {fileID: 0}
   mainCam: {fileID: 0}
   dashFOV: 70
   fovLerpSpeed: 5
@@ -6917,6 +6916,10 @@ MonoBehaviour:
   attackDamage: 25
   toggleAxe: {fileID: 6679853431289264556}
   toggleAxe2: {fileID: 7803816212305273435}
+  slash1: {fileID: 0}
+  slash2: {fileID: 0}
+  slash3: {fileID: 0}
+  attackGateBehaviour: {fileID: 0}
 --- !u!114 &7205059177896877071
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6942,7 +6945,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minimumSpeed: 0.1
-  stepVolume: 0.3
+  stepVolume: 0.2
   stepInterval: 0.5
 --- !u!114 &8792134517257224937
 MonoBehaviour:
@@ -6982,7 +6985,14 @@ MonoBehaviour:
   lastDirection: {x: 0, y: 0, z: 1}
   acceleration: 12
   deceleration: 14
+  baseTurnSpeed: 16
+  boostedTurnSpeed: 28
+  turnBoostDotThreshold: 0.2
+  sprintSpeed: 3.5
+  sprintRampUp: 10
+  sprintRampDown: 14
   gravity: -20
+  groundedStick: -2
   dustParticle: {fileID: 6748117665716664480}
 --- !u!114 &1490408445296009443
 MonoBehaviour:

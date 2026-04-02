@@ -5127,7 +5127,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 267cbb22d9ade19448a4a4ef32e568bf, type: 3}
       propertyPath: m_Name
-      value: Veymar Corrupted 1
+      value: VeymarCorrupted
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 267cbb22d9ade19448a4a4ef32e568bf, type: 3}
       propertyPath: m_Layer
@@ -5448,7 +5448,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   faction: 1
-  maxHealth: 750
+  maxHealth: 850
   currentHealth: 0
 --- !u!114 &1954946480777414603
 MonoBehaviour:
