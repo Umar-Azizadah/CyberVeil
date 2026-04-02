@@ -1,5 +1,6 @@
 using UnityEngine;
 using CyberVeil.Core;
+using CyberVeil.Systems;
 
 namespace CyberVeil.Combat
 {
@@ -50,6 +51,10 @@ namespace CyberVeil.Combat
                     if (targetHealth.faction != attackerFaction)
                     {
                         targetHealth.TakeDamage(damage);
+
+                        // Subtle screen shake when the PLAYER damages an ENEMY
+                        if (attackerFaction == Faction.Player && targetHealth.faction == Faction.Enemy)
+                            ScreenShake.KickSubtle();
 
                         IKnockbackable knockbackTarget = hit.GetComponent<IKnockbackable>();
                         knockbackTarget?.ApplyKnockback(attacker.transform);

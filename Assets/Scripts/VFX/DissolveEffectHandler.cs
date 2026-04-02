@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using CyberVeil.Player;
+using CyberVeil.Systems;
 
 namespace CyberVeil.VFX
 {
@@ -11,8 +12,11 @@ namespace CyberVeil.VFX
         public Material baseMaterial;
         public Material dissolveDashMaterial;
         public Material dissolveDamageMaterial;
+        public Material veilSurgeMaterial;
+        public Material deathMaterial;
         public toggleAxe toggleAxe1;
         public toggleAxe2 toggleAxe2;
+        private VeilSurgeSkill veilSurgeSkill;
 
         [Header("Dissolve Settings")]
         public string dissolveProperty = "_Dissolve";
@@ -23,7 +27,12 @@ namespace CyberVeil.VFX
         private void Start()
         {
             targetRenderer.material = baseMaterial;
-
+            
+            // Find VeilSurgeSkill on this player
+            if (veilSurgeSkill == null)
+            {
+                veilSurgeSkill = GetComponent<VeilSurgeSkill>();
+            }
         }
         public IEnumerator DissolveOut(Material dissolveMaterial, float dissolveDuration)
         {
@@ -61,7 +70,15 @@ namespace CyberVeil.VFX
             toggleAxe1?.ShowAxe();
             toggleAxe2?.ShowAxe2();
 
-            targetRenderer.material = baseMaterial;
+            // Revert to VeilSurge material if active, otherwise base material
+            if (veilSurgeSkill != null && veilSurgeSkill.IsVeilSurge)
+            {
+                targetRenderer.material = veilSurgeMaterial;
+            }
+            else
+            {
+                targetRenderer.material = baseMaterial;
+            }
         }
 
         public void FlashDamageMaterial(float duration)
@@ -74,7 +91,17 @@ namespace CyberVeil.VFX
             targetRenderer.material = tempMat;
             targetRenderer.material.SetFloat(dissolveProperty, 1f);
             yield return new WaitForSeconds(duration);
-            targetRenderer.material = baseMaterial;
+            
+            // Revert to VeilSurge material if active, otherwise base material
+            if (veilSurgeSkill != null && veilSurgeSkill.IsVeilSurge)
+            {
+                targetRenderer.material = veilSurgeMaterial;
+            }
+            else
+            {
+                targetRenderer.material = baseMaterial;
+            }
+            
             targetRenderer.material.SetFloat(dissolveProperty, 0f);
         }
 

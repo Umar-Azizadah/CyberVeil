@@ -42,7 +42,7 @@ namespace CyberVeil.Enemies
         {
             // Ensure player is assigned
             if (player == null)
-                player = GameObject.FindGameObjectWithTag("Player")?.transform;
+                player = PlayerReference.PlayerTransform;
 
             // Get the enemy GameObject that spawned this attack prefab
             slimeTransform = transform.parent;

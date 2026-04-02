@@ -1,5 +1,6 @@
 using UnityEngine;
 using CyberVeil.Core;
+using CyberVeil.Systems;
 using System.Collections;
 
 namespace CyberVeil.Enemies
@@ -55,7 +56,7 @@ namespace CyberVeil.Enemies
             damagedBehavior = GetComponent<EnemyDamaged>();
             attackSelector = GetComponent<EnemyAttackSelector>();
 
-            player = GameObject.FindGameObjectWithTag("Player")?.transform;
+            player = PlayerReference.PlayerTransform;
         }
 
         /// <summary>
@@ -65,7 +66,15 @@ namespace CyberVeil.Enemies
         /// </summary>
         void Update()
         {
-            float distance = Vector3.Distance(transform.position, player.position);
+            // Guard against null player reference
+            if (player == null)
+                return;
+
+            // Use SqrMagnitude instead of Distance to avoid expensive sqrt calculation
+            float distanceSqr = (transform.position - player.position).sqrMagnitude;
+            float detectionRangeSqr = detectionRange * detectionRange;
+            float strafeMinDistanceSqr = strafeMinDistance * strafeMinDistance;
+            float strafeMaxDistanceSqr = strafeMaxDistance * strafeMaxDistance;
 
             switch (currentAIState)
             {
@@ -74,9 +83,9 @@ namespace CyberVeil.Enemies
                     // Otherwise, enter chase state if player is within detection range
                     if (patrolBehavior != null)
                         ChangeAIState(EnemyAIState.Patrol);
-                    else if (distance < detectionRange)
+                    else if (distanceSqr < detectionRangeSqr)
                         ChangeAIState(EnemyAIState.Chase);
-                    break;
+                    return;
 
                 case EnemyAIState.Patrol:
                     characterStateMachine.ChangeState(CharacterState.Moving);
@@ -84,25 +93,27 @@ namespace CyberVeil.Enemies
                     if (patrolBehavior.waiting)
                         characterStateMachine.ChangeState(CharacterState.Idle);
                     // Transition to Chase if player is nearby
-                    if (distance < detectionRange)
+                    if (distanceSqr < detectionRangeSqr)
                         ChangeAIState(EnemyAIState.Chase);
-                    break;
+                    return;
 
                 case EnemyAIState.Chase:
                     // Actively pursue the player while in detection range
                     // If an attack is available based on range and cooldown, transition to attack
                     characterStateMachine.ChangeState(CharacterState.Moving);
                     if (attackSelector.HasAttackReady())
+                    {
                         ChangeAIState(EnemyAIState.Attack);
+                        return;
+                    }
                     // Conditional strafe: chance, cooldown, and distance window
-                    if (Time.time - lastStrafeTime > strafeCooldown && Random.value < strafeChance && distance >= strafeMinDistance && distance <= strafeMaxDistance)
+                    if (Time.time - lastStrafeTime > strafeCooldown && Random.value < strafeChance && distanceSqr >= strafeMinDistanceSqr && distanceSqr <= strafeMaxDistanceSqr)
                     {
                         lastStrafeTime = Time.time;
                         waitStartTime = Time.time;
                         ChangeAIState(EnemyAIState.Strafe);
                     }
-
-                    break;
+                    return;
 
                 case EnemyAIState.Strafe:
                     characterStateMachine.ChangeState(CharacterState.Strafing);
@@ -113,14 +124,13 @@ namespace CyberVeil.Enemies
 
                     transform.position += strafeDir * 0.5f * Time.deltaTime;
 
-                    // Facee player while strafing
+                    // Face player while strafing
                     transform.rotation = Quaternion.LookRotation(toPlayer);
 
                     // Exit after short duration
                     if (Time.time - waitStartTime > 1.2f)
                         ChangeAIState(EnemyAIState.Chase);
-                    break;
-
+                    return;
 
                 case EnemyAIState.Attack:
                     // Executes the selected attack if cooldown has elapsed
@@ -132,19 +142,18 @@ namespace CyberVeil.Enemies
                         // Begins the attack and transitions to Wait once it completes (prevents spam attack)
                         StartCoroutine(HandleAttack(() => ChangeAIState(EnemyAIState.Wait)));
                     }
-                    
-                    break;
+                    return;
 
                 case EnemyAIState.Wait:
                     characterStateMachine.ChangeState(CharacterState.Idle);
                     // Brief delay after an attack before evaluating next action
                     // Returns to Chase if player has moved away
                     // Otherwise, rechecks cooldown availability before attacking again
-                    if (distance > 1.5f)
+                    if (distanceSqr > 2.25f) // 1.5f * 1.5f = 2.25f
                         ChangeAIState(EnemyAIState.Chase);
                     else if (Time.time - waitStartTime > waitDuration && attackSelector.HasAttackReady())
                         ChangeAIState(EnemyAIState.Attack);
-                    break;
+                    return;
 
                 case EnemyAIState.Damaged:
                     // Enemy is temporarily staggered from taking damage
@@ -158,7 +167,7 @@ namespace CyberVeil.Enemies
                             ChangeAIState(EnemyAIState.Chase); // return to Chase after damage done
                         });
                     }
-                    break;
+                    return;
             }
         }
 

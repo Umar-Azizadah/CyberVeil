@@ -11,8 +11,11 @@ namespace CyberVeil.Player
         //stores player transform
         public Transform playerTransform;
         public Vector3 offset = new Vector3(0, 0.0f, 0);
+        [SerializeField] private Vector3 rotationOffset = Vector3.zero;
+        
         //reference player controller
         public PlayerAttack playerAttack;
+        private VeilSurgeSkill veilSurgeSkill;
 
         void Start()
         {
@@ -21,18 +24,35 @@ namespace CyberVeil.Player
             {
                 playerAttack = GetComponent<PlayerAttack>();
             }
+
+            // Auto-find VeilSurgeSkill - search in parent or root player
+            if (veilSurgeSkill == null)
+            {
+                veilSurgeSkill = GetComponentInParent<VeilSurgeSkill>();
+            }
+            if (veilSurgeSkill == null)
+            {
+                veilSurgeSkill = FindObjectOfType<VeilSurgeSkill>();
+            }
         }
 
         public void PlaySlash(Vector3 forwardDir)
         {
             Vector3 slashPosition = playerTransform.position + offset;
-            Quaternion slashRotation = playerTransform.rotation;
+            Quaternion slashRotation = playerTransform.rotation * Quaternion.Euler(rotationOffset);
 
             transform.position = slashPosition;
             transform.rotation = slashRotation;
 
-            ParticleManager.Instance.PlayEffect(VFXType.Slash3, slashPosition, slashRotation);
-            ParticleManager.Instance.PlayEffect(VFXType.Slash3, slashPosition, slashRotation);
+            // Check if VeilSurge is active and play surge slash instead
+            VFXType slashType = VFXType.Slash3;
+            if (veilSurgeSkill != null && veilSurgeSkill.IsVeilSurge)
+            {
+                slashType = VFXType.SurgeSlash3;
+            }
+
+            ParticleManager.Instance.PlayEffect(slashType, slashPosition, slashRotation);
+            ParticleManager.Instance.PlayEffect(slashType, slashPosition, slashRotation);
             StartCoroutine(toggleCollider());
         }
 

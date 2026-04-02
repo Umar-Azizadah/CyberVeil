@@ -16,8 +16,11 @@ namespace CyberVeil.Player
         public float xRotate = 90f;
         public float yRotate = 45f;
         public float zRotate = 45f;
+        [SerializeField] private Vector3 rotationOffset = Vector3.zero;
+        
         //reference to the new attack component
         public PlayerAttack playerAttack;
+        private VeilSurgeSkill veilSurgeSkill;
 
 
         void Start()
@@ -26,6 +29,16 @@ namespace CyberVeil.Player
             if (playerAttack == null)
             {
                 playerAttack = GetComponent<PlayerAttack>();
+            }
+
+            // Auto-find VeilSurgeSkill - search in parent or root player
+            if (veilSurgeSkill == null)
+            {
+                veilSurgeSkill = GetComponentInParent<VeilSurgeSkill>();
+            }
+            if (veilSurgeSkill == null)
+            {
+                veilSurgeSkill = FindObjectOfType<VeilSurgeSkill>();
             }
         }
         public void PlaySlash(Vector3 forwardDir)
@@ -36,13 +49,20 @@ namespace CyberVeil.Player
             Quaternion baseRotation = playerTransform.rotation;
 
             // Extra rotation (applied as a rotation offset)
-            Quaternion customOffset = Quaternion.Euler(xRotate, yRotate, zRotate);
+            Quaternion customOffset = Quaternion.Euler(xRotate, yRotate, zRotate) * Quaternion.Euler(rotationOffset);
 
             Quaternion finalRotation = baseRotation * customOffset;
 
+            // Check if VeilSurge is active and play surge slash instead
+            VFXType slashType = VFXType.Slash2;
+            if (veilSurgeSkill != null && veilSurgeSkill.IsVeilSurge)
+            {
+                slashType = VFXType.SurgeSlash2;
+            }
+
             // Sets slash effect position and rotation via ParticleManager
-            ParticleManager.Instance.PlayEffect(VFXType.Slash2, slashPosition, finalRotation);
-            ParticleManager.Instance.PlayEffect(VFXType.Slash2, slashPosition, finalRotation);
+            ParticleManager.Instance.PlayEffect(slashType, slashPosition, finalRotation);
+            ParticleManager.Instance.PlayEffect(slashType, slashPosition, finalRotation);
             StartCoroutine(toggleCollider());
         }
 

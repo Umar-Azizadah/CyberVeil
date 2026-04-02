@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using CyberVeil.Systems;
 
 namespace CyberVeil.Enemies
 {
@@ -25,7 +26,7 @@ namespace CyberVeil.Enemies
         /// </summary>
         private void Awake()
         {
-            player = GameObject.FindGameObjectWithTag("Player")?.transform;
+            player = PlayerReference.PlayerTransform;
             lastUsedTimestamps = new float[attacks.Count];
             for (int i = 0; i < attacks.Count; i++) lastUsedTimestamps[i] = -Mathf.Infinity; // Ensures all attacks are initially ready
         }
@@ -36,11 +37,12 @@ namespace CyberVeil.Enemies
         /// </summary>
         public bool HasAttackReady()
         {
-            float dist = Vector3.Distance(transform.position, player.position);
+            float distSqr = (transform.position - player.position).sqrMagnitude;
             for (int i = 0; i < attacks.Count; i++)
             {
+                float rangeSqr = attacks[i].attackRange * attacks[i].attackRange;
                 if (Time.time >= lastUsedTimestamps[i] + attacks[i].cooldown &&
-                    dist <= attacks[i].attackRange)
+                    distSqr <= rangeSqr)
                 {
                     selectedAttack = attacks[i];
                     return true;

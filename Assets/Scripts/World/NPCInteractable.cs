@@ -30,6 +30,9 @@ namespace CyberVeil.World
         };
         [SerializeField] private DialogueUI dialogue;
         [SerializeField] private float autoAdvanceSeconds = 4f;
+        [SerializeField] private SoundType talkAudio;
+        [Range(0f, 1f)] public float talkVolume = 0.5f;
+
 
         private Coroutine convo;
         private NameTag nameTag;
@@ -72,6 +75,7 @@ namespace CyberVeil.World
         /// </summary>
         private IEnumerator RunConversation(IInteractor interactor)
         {
+            SoundManager.PlaySound(talkAudio, talkVolume);
             for (int i = 0; i < lines.Length; i++) // Iterate in order through all dialogue lines
             {
                 dialogue?.ShowLine(lines[i]);

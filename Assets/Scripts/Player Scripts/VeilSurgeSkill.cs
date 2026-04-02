@@ -55,7 +55,7 @@ namespace CyberVeil.Player
         private void Update()
         {
             // Check E key to activate (only if cooldown ready)
-            if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+            if (Keyboard.current != null && Keyboard.current.xKey.wasPressedThisFrame)
             {
                 if (Time.time - lastSkillTime >= skillCooldown)
                 {

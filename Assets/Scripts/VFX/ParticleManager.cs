@@ -23,6 +23,9 @@ namespace CyberVeil.VFX
         MushroomHit,
         JabHit,
         VeilSurgeActivation,
+        SurgeSlash1,
+        SurgeSlash2,
+        SurgeSlash3,
         
     }
 

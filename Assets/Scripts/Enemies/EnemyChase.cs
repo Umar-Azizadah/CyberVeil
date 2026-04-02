@@ -1,4 +1,5 @@
 using UnityEngine;
+using CyberVeil.Systems;
 namespace CyberVeil.Enemies
 {
     /// <summary>
@@ -18,7 +19,7 @@ namespace CyberVeil.Enemies
         private void Start()
         {
             enemyAI = GetComponent<EnemyAIController>();
-            player = GameObject.FindGameObjectWithTag("Player")?.transform;
+            player = PlayerReference.PlayerTransform;
         }
 
         private void Update()

@@ -12,9 +12,11 @@ namespace CyberVeil.Player
         //stores player transform
         public Transform playerTransform;
         public Vector3 offset = new Vector3(0f, 0.0f, 0);
+        [SerializeField] private Vector3 rotationOffset = Vector3.zero;
 
         //reference to the new attack component
         public PlayerAttack playerAttack;
+        private VeilSurgeSkill veilSurgeSkill;
 
 
         void Start()
@@ -24,17 +26,34 @@ namespace CyberVeil.Player
             {
                 playerAttack = GetComponent<PlayerAttack>();
             }
+
+            //auto-find VeilSurgeSkill - search in parent or root player
+            if (veilSurgeSkill == null)
+            {
+                veilSurgeSkill = GetComponentInParent<VeilSurgeSkill>();
+            }
+            if (veilSurgeSkill == null)
+            {
+                veilSurgeSkill = FindObjectOfType<VeilSurgeSkill>();
+            }
         }
 
         public void PlaySlash(Vector3 forwardDir)
         {
             Vector3 slashPosition = playerTransform.position + forwardDir * 1.0f + offset;
-            Quaternion slashRotation = playerTransform.rotation;
+            Quaternion slashRotation = playerTransform.rotation * Quaternion.Euler(rotationOffset);
 
             transform.position = slashPosition;
             transform.rotation = slashRotation;
 
-            ParticleManager.Instance.PlayEffect(VFXType.Slash1, slashPosition, slashRotation);
+            // Check if VeilSurge is active and play surge slash instead
+            VFXType slashType = VFXType.Slash1;
+            if (veilSurgeSkill != null && veilSurgeSkill.IsVeilSurge)
+            {
+                slashType = VFXType.SurgeSlash1;
+            }
+
+            ParticleManager.Instance.PlayEffect(slashType, slashPosition, slashRotation);
             StartCoroutine(toggleCollider());
         }
 
