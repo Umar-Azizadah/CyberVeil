@@ -2373,7 +2373,6 @@ GameObject:
   - component: {fileID: 7146308519465974280}
   - component: {fileID: 1809192108539286105}
   - component: {fileID: 1875988049871814082}
-  - component: {fileID: 7419510634455391553}
   - component: {fileID: 4751260908657568205}
   - component: {fileID: 6502537209334919536}
   - component: {fileID: 7642281380036198241}
@@ -2427,6 +2426,12 @@ MonoBehaviour:
   strafeMinDistance: 1.5
   strafeMaxDistance: 6
   lastAttackTime: -999
+  retreatHealthThreshold: 0.25
+  retreatDuration: 1.5
+  retreatCooldownSeconds: 4
+  retreatCheckRadius: 6
+  retreatSpeed: 1
+  retreatTurnSpeed: 8
   currentAIState: 0
 --- !u!95 &7089640094533286565
 Animator:
@@ -2530,6 +2535,8 @@ MonoBehaviour:
   baseMaterial: {fileID: 2100000, guid: 92745c535025ff24f8c4bc9d283a3216, type: 2}
   dissolveDashMaterial: {fileID: 0}
   dissolveDamageMaterial: {fileID: 2100000, guid: fc40dc0440d3b4b40ada6fb2d322efbb, type: 2}
+  veilSurgeMaterial: {fileID: 0}
+  deathMaterial: {fileID: 0}
   toggleAxe1: {fileID: 0}
   toggleAxe2: {fileID: 0}
   dissolveProperty: _Dissolve
@@ -2575,25 +2582,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shaderEffectHandler: {fileID: 5770214323756495411}
---- !u!114 &7419510634455391553
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7636592267669719379}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d4c6ef1f646a87746be91c1ece28ca87, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetRenderer: {fileID: 4507629314728201548}
-  baseMaterial: {fileID: 2100000, guid: 92745c535025ff24f8c4bc9d283a3216, type: 2}
-  dissolveDashMaterial: {fileID: 0}
-  dissolveDamageMaterial: {fileID: 2100000, guid: fc40dc0440d3b4b40ada6fb2d322efbb, type: 2}
-  toggleAxe1: {fileID: 0}
-  toggleAxe2: {fileID: 0}
-  dissolveProperty: _Dissolve
 --- !u!114 &4751260908657568205
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2648,6 +2636,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chaseSpeed: 2.4
   rotationSpeed: 8
+  flankCheckRadius: 4.5
+  flankSpacing: 1.5
+  flankMinChasers: 2
 --- !u!114 &1986889212454315410
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2668,7 +2659,7 @@ MonoBehaviour:
   particleSpawnOffset: {x: 0, y: 1, z: 0}
   playAudioOnStartAttack: 1
   playAudioOnEndAttack: 0
-  playSecondParticle: 1
+  playSecondParticle: 0
   audioType: 23
   audioType2: 1
   audioVolume: 0.5
@@ -2716,6 +2707,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attacks:
   - {fileID: 11400000, guid: 2045c24aa1281954cb7019676f35ee62, type: 2}
+  - {fileID: 11400000, guid: 4b1903d9fa7e438479bc90a6e5fde406, type: 2}
 --- !u!82 &3497137576397999910
 AudioSource:
   m_ObjectHideFlags: 0

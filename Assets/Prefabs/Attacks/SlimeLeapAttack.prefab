@@ -55,4 +55,4 @@ MonoBehaviour:
   particleAndOrAudioPlayDelay: 0.3
   damageRadius: 2
   damageDelay: 1
-  damageAmount: 20
+  damageAmount: 18

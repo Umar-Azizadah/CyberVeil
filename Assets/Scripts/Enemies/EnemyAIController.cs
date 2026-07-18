@@ -2,6 +2,8 @@ using UnityEngine;
 using CyberVeil.Core;
 using CyberVeil.Systems;
 using System.Collections;
+using System.Collections.Generic;
+using CyberVeil.Combat;
 
 namespace CyberVeil.Enemies
 {
@@ -35,15 +37,28 @@ namespace CyberVeil.Enemies
         private float waitStartTime = -1f;
         private float waitDuration = 0.7f;
 
+        [Header("Retreat Settings")]
+        [Range(0f, 1f)]
+        [SerializeField] private float retreatHealthThreshold = 0.25f;
+        [SerializeField] private float retreatDuration = 1.5f;
+        [SerializeField] private float retreatCooldownSeconds = 4f;
+        [SerializeField] private float retreatCheckRadius = 6f;
+        [SerializeField] private float retreatSpeed = 1.5f;
+        [SerializeField] private float retreatTurnSpeed = 8f;
+        private float retreatStartTime = -1f;
+        private float lastRetreatTime = -999f;
+
         [Header("References")]
         private CharacterStateMachine characterStateMachine;
         private EnemyPatrol patrolBehavior;
         private EnemyChase chaseBehavior;
         private EnemyDamaged damagedBehavior;
+        private HealthComponent health;
         private Transform player;
         public EnemyAIState currentAIState = EnemyAIState.Idle;
         private EnemyAttackSelector attackSelector;
         private EnemyAttackData currentAttack;
+        private int strafeDirection = 1;
 
         /// <summary>
         /// Caches all required references and components at runtime
@@ -55,8 +70,15 @@ namespace CyberVeil.Enemies
             chaseBehavior = GetComponent<EnemyChase>();
             damagedBehavior = GetComponent<EnemyDamaged>();
             attackSelector = GetComponent<EnemyAttackSelector>();
+            health = GetComponent<HealthComponent>();
 
             player = PlayerReference.PlayerTransform;
+
+            // Apply active trial curse speed multiplier to newly spawned enemies
+            if (TrialCurseModifier.EnemySpeedMultiplier > 1f)
+            {
+                speed *= TrialCurseModifier.EnemySpeedMultiplier;
+            }
         }
 
         /// <summary>
@@ -75,6 +97,11 @@ namespace CyberVeil.Enemies
             float detectionRangeSqr = detectionRange * detectionRange;
             float strafeMinDistanceSqr = strafeMinDistance * strafeMinDistance;
             float strafeMaxDistanceSqr = strafeMaxDistance * strafeMaxDistance;
+
+            if (currentAIState != EnemyAIState.Retreat && currentAIState != EnemyAIState.Damaged && ShouldRetreat())
+            {
+                ChangeAIState(EnemyAIState.Retreat);
+            }
 
             switch (currentAIState)
             {
@@ -120,7 +147,7 @@ namespace CyberVeil.Enemies
 
                     // Picks a strafe direction (sideways or back)
                     Vector3 toPlayer = (player.position - transform.position).normalized;
-                    Vector3 strafeDir = Vector3.Cross(Vector3.up, toPlayer); // Left/right
+                    Vector3 strafeDir = Vector3.Cross(Vector3.up, toPlayer) * strafeDirection; // Left/right
 
                     transform.position += strafeDir * 0.5f * Time.deltaTime;
 
@@ -129,6 +156,23 @@ namespace CyberVeil.Enemies
 
                     // Exit after short duration
                     if (Time.time - waitStartTime > 1.2f)
+                        ChangeAIState(EnemyAIState.Chase);
+                    return;
+
+                case EnemyAIState.Retreat:
+                    characterStateMachine.ChangeState(CharacterState.Moving);
+
+                    Vector3 retreatDir = (transform.position - player.position).normalized;
+                    Vector3 retreatMove = new Vector3(retreatDir.x, 0f, retreatDir.z);
+                    transform.position += retreatMove * retreatSpeed * speed * Time.deltaTime;
+
+                    if (retreatMove.sqrMagnitude > 0.0001f)
+                    {
+                        Quaternion targetRotation = Quaternion.LookRotation(retreatMove);
+                        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, retreatTurnSpeed * Time.deltaTime);
+                    }
+
+                    if (Time.time - retreatStartTime > retreatDuration)
                         ChangeAIState(EnemyAIState.Chase);
                     return;
 
@@ -233,7 +277,45 @@ namespace CyberVeil.Enemies
             if (newState == EnemyAIState.Wait)
                 waitStartTime = Time.time;
 
+            if (newState == EnemyAIState.Strafe)
+                strafeDirection = Random.value < 0.5f ? -1 : 1;
+
+            if (newState == EnemyAIState.Retreat)
+                lastRetreatTime = Time.time;
+            if (newState == EnemyAIState.Retreat)
+                retreatStartTime = Time.time;
+
             currentAIState = newState;
+        }
+
+        private bool ShouldRetreat()
+        {
+            if (health == null)
+                return false;
+
+            if (Time.time - lastRetreatTime < retreatCooldownSeconds)
+                return false;
+
+            if (health.Normalized >= retreatHealthThreshold)
+                return false;
+
+            int aliveNearby = CountNearbyAllies();
+            return aliveNearby < 1;
+        }
+
+        private int CountNearbyAllies()
+        {
+            Collider[] hits = Physics.OverlapSphere(transform.position, retreatCheckRadius);
+            HashSet<EnemyAIController> allies = new HashSet<EnemyAIController>();
+
+            for (int i = 0; i < hits.Length; i++)
+            {
+                EnemyAIController ai = hits[i].GetComponentInParent<EnemyAIController>();
+                if (ai != null && ai != this)
+                    allies.Add(ai);
+            }
+
+            return allies.Count;
         }
 
     }

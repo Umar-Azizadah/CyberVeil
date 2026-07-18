@@ -6591,7 +6591,6 @@ GameObject:
   - component: {fileID: 9017504984987825220}
   - component: {fileID: 9087623867311858234}
   - component: {fileID: 1650976365179897228}
-  - component: {fileID: 5826927311636587095}
   - component: {fileID: 2538038626523200545}
   - component: {fileID: 3744773767943768980}
   - component: {fileID: 6828747725431564717}
@@ -6649,6 +6648,12 @@ MonoBehaviour:
   strafeMinDistance: 1.5
   strafeMaxDistance: 6
   lastAttackTime: -999
+  retreatHealthThreshold: 0.25
+  retreatDuration: 1.5
+  retreatCooldownSeconds: 4
+  retreatCheckRadius: 6
+  retreatSpeed: 1
+  retreatTurnSpeed: 8
   currentAIState: 0
 --- !u!95 &8591801401755711284
 Animator:
@@ -6750,8 +6755,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetRenderer: {fileID: 6012990804539099004}
   baseMaterial: {fileID: 2100000, guid: eaba8290399b44644b1fc71f4b08572a, type: 2}
-  dissolveDashMaterial: {fileID: 2100000, guid: eaba8290399b44644b1fc71f4b08572a, type: 2}
+  dissolveDashMaterial: {fileID: 0}
   dissolveDamageMaterial: {fileID: 2100000, guid: fc40dc0440d3b4b40ada6fb2d322efbb, type: 2}
+  veilSurgeMaterial: {fileID: 0}
+  deathMaterial: {fileID: 0}
   toggleAxe1: {fileID: 0}
   toggleAxe2: {fileID: 0}
   dissolveProperty: _Dissolve
@@ -6784,25 +6791,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   soundType: 5
   volume: 0.35
---- !u!114 &5826927311636587095
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6312980647891792800}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d4c6ef1f646a87746be91c1ece28ca87, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetRenderer: {fileID: 6012990804539099004}
-  baseMaterial: {fileID: 2100000, guid: eaba8290399b44644b1fc71f4b08572a, type: 2}
-  dissolveDashMaterial: {fileID: 0}
-  dissolveDamageMaterial: {fileID: 2100000, guid: fc40dc0440d3b4b40ada6fb2d322efbb, type: 2}
-  toggleAxe1: {fileID: 0}
-  toggleAxe2: {fileID: 0}
-  dissolveProperty: _Dissolve
 --- !u!114 &2538038626523200545
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6870,6 +6858,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chaseSpeed: 1.2
   rotationSpeed: 8
+  flankCheckRadius: 4.5
+  flankSpacing: 1.5
+  flankMinChasers: 2
 --- !u!114 &5263657131124551704
 MonoBehaviour:
   m_ObjectHideFlags: 0

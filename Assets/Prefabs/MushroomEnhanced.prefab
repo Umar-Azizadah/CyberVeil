@@ -6326,7 +6326,6 @@ GameObject:
   - component: {fileID: 5344397474034284134}
   - component: {fileID: 5921025101564834622}
   - component: {fileID: 7971894614765993374}
-  - component: {fileID: 4934366330278479674}
   - component: {fileID: 6015511849572398811}
   - component: {fileID: 4622683380425986403}
   - component: {fileID: 6320394110208210039}
@@ -6381,6 +6380,12 @@ MonoBehaviour:
   strafeMinDistance: 1.5
   strafeMaxDistance: 6
   lastAttackTime: -999
+  retreatHealthThreshold: 0.25
+  retreatDuration: 1.5
+  retreatCooldownSeconds: 4
+  retreatCheckRadius: 6
+  retreatSpeed: 1
+  retreatTurnSpeed: 8
   currentAIState: 0
 --- !u!95 &2749255761449696861
 Animator:
@@ -6484,6 +6489,8 @@ MonoBehaviour:
   baseMaterial: {fileID: 2100000, guid: 92745c535025ff24f8c4bc9d283a3216, type: 2}
   dissolveDashMaterial: {fileID: 0}
   dissolveDamageMaterial: {fileID: 2100000, guid: fc40dc0440d3b4b40ada6fb2d322efbb, type: 2}
+  veilSurgeMaterial: {fileID: 0}
+  deathMaterial: {fileID: 0}
   toggleAxe1: {fileID: 0}
   toggleAxe2: {fileID: 0}
   dissolveProperty: _Dissolve
@@ -6529,25 +6536,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shaderEffectHandler: {fileID: 8416811434838163895}
---- !u!114 &4934366330278479674
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1673942831247481681}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d4c6ef1f646a87746be91c1ece28ca87, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetRenderer: {fileID: 2025120242321750273}
-  baseMaterial: {fileID: 2100000, guid: 92745c535025ff24f8c4bc9d283a3216, type: 2}
-  dissolveDashMaterial: {fileID: 0}
-  dissolveDamageMaterial: {fileID: 2100000, guid: fc40dc0440d3b4b40ada6fb2d322efbb, type: 2}
-  toggleAxe1: {fileID: 0}
-  toggleAxe2: {fileID: 0}
-  dissolveProperty: _Dissolve
 --- !u!114 &6015511849572398811
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6602,6 +6590,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chaseSpeed: 2.4
   rotationSpeed: 8
+  flankCheckRadius: 4.5
+  flankSpacing: 1.5
+  flankMinChasers: 2
 --- !u!114 &-8146182138653953188
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6686,6 +6677,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attacks:
   - {fileID: 11400000, guid: 019fae6b878dc854aa61282748cb62ff, type: 2}
+  - {fileID: 11400000, guid: 4b1903d9fa7e438479bc90a6e5fde406, type: 2}
 --- !u!82 &-316534455328025230
 AudioSource:
   m_ObjectHideFlags: 0

@@ -5365,6 +5365,12 @@ MonoBehaviour:
   strafeMinDistance: 6
   strafeMaxDistance: 10
   lastAttackTime: -999
+  retreatHealthThreshold: 0.25
+  retreatDuration: 1.5
+  retreatCooldownSeconds: 4
+  retreatCheckRadius: 6
+  retreatSpeed: 1
+  retreatTurnSpeed: 8
   currentAIState: 0
 --- !u!136 &3446251364800295530
 CapsuleCollider:
@@ -5432,6 +5438,8 @@ MonoBehaviour:
   baseMaterial: {fileID: 2100000, guid: 2adfefe75c2e61247a28dd200297ca02, type: 2}
   dissolveDashMaterial: {fileID: 0}
   dissolveDamageMaterial: {fileID: 2100000, guid: fc40dc0440d3b4b40ada6fb2d322efbb, type: 2}
+  veilSurgeMaterial: {fileID: 0}
+  deathMaterial: {fileID: 0}
   toggleAxe1: {fileID: 0}
   toggleAxe2: {fileID: 0}
   dissolveProperty: _Dissolve
@@ -5504,6 +5512,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chaseSpeed: 1.6
   rotationSpeed: 8
+  flankCheckRadius: 4.5
+  flankSpacing: 1.5
+  flankMinChasers: 2
 --- !u!114 &6930809867351239408
 MonoBehaviour:
   m_ObjectHideFlags: 0

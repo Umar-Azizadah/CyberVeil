@@ -17153,7 +17153,6 @@ GameObject:
   - component: {fileID: 7312244273281459190}
   - component: {fileID: 3199539891323658287}
   - component: {fileID: 8989122243466086335}
-  - component: {fileID: 4669232310695029410}
   - component: {fileID: 5063676111509625808}
   - component: {fileID: 8022842001634410233}
   - component: {fileID: 4970180664819074223}
@@ -17211,6 +17210,12 @@ MonoBehaviour:
   strafeMinDistance: 1.5
   strafeMaxDistance: 6
   lastAttackTime: -999
+  retreatHealthThreshold: 0.25
+  retreatDuration: 1.5
+  retreatCooldownSeconds: 4
+  retreatCheckRadius: 6
+  retreatSpeed: 1
+  retreatTurnSpeed: 8
   currentAIState: 0
 --- !u!95 &5486861889206638307
 Animator:
@@ -17312,8 +17317,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetRenderer: {fileID: 472721240576239270}
   baseMaterial: {fileID: 2100000, guid: eaba8290399b44644b1fc71f4b08572a, type: 2}
-  dissolveDashMaterial: {fileID: 2100000, guid: eaba8290399b44644b1fc71f4b08572a, type: 2}
+  dissolveDashMaterial: {fileID: 0}
   dissolveDamageMaterial: {fileID: 2100000, guid: fc40dc0440d3b4b40ada6fb2d322efbb, type: 2}
+  veilSurgeMaterial: {fileID: 0}
+  deathMaterial: {fileID: 0}
   toggleAxe1: {fileID: 0}
   toggleAxe2: {fileID: 0}
   dissolveProperty: _Dissolve
@@ -17346,25 +17353,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   soundType: 5
   volume: 0.35
---- !u!114 &4669232310695029410
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8821599309074932705}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d4c6ef1f646a87746be91c1ece28ca87, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetRenderer: {fileID: 472721240576239270}
-  baseMaterial: {fileID: 2100000, guid: eaba8290399b44644b1fc71f4b08572a, type: 2}
-  dissolveDashMaterial: {fileID: 0}
-  dissolveDamageMaterial: {fileID: 2100000, guid: fc40dc0440d3b4b40ada6fb2d322efbb, type: 2}
-  toggleAxe1: {fileID: 0}
-  toggleAxe2: {fileID: 0}
-  dissolveProperty: _Dissolve
 --- !u!114 &5063676111509625808
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17432,6 +17420,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chaseSpeed: 1.2
   rotationSpeed: 8
+  flankCheckRadius: 4.5
+  flankSpacing: 1.5
+  flankMinChasers: 2
 --- !u!114 &960708196786322197
 MonoBehaviour:
   m_ObjectHideFlags: 0
