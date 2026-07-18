@@ -12,6 +12,8 @@ namespace CyberVeil.Player
     {
         [SerializeField] private int limit = 5; // Max nunmber of consecutive attacks before lock
 
+        private int defaultLimit;
+
         private int count = 0;
         private CharacterStateMachine fsm; // Reference to finate state machine used to listen for dash transitions
 
@@ -23,6 +25,7 @@ namespace CyberVeil.Player
 
         private void Awake()
         {
+            defaultLimit = limit;
             fsm = GetComponent<CharacterStateMachine>();
             if (fsm != null)
                 fsm.OnStateChange += OnStateChange; // Subscribe OnStateChange method to fsm state change event 
@@ -61,6 +64,24 @@ namespace CyberVeil.Player
         public void ResetGate()
         {
             count = 0; // Unlocks attacks again
+        }
+
+        /// <summary>
+        /// Allows runtime modification of the attack limit (e.g., curse modifiers)
+        /// </summary>
+        public void SetLimit(int newLimit)
+        {
+            limit = Mathf.Max(1, newLimit);
+            ResetGate();
+        }
+
+        /// <summary>
+        /// Restores the original limit from when this component initialized
+        /// </summary>
+        public void ResetLimit()
+        {
+            limit = Mathf.Max(1, defaultLimit);
+            ResetGate();
         }
     }
 

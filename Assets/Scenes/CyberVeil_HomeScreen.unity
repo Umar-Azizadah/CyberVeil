@@ -135071,6 +135071,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   portalName: Upgrade Portal
   prompt: Upgrade
+  dialogueUI: {fileID: 0}
+  incompleteWavesMessage: Clear all corrupted
 --- !u!4 &1798615552 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 718c19bfb0f03b748b2657f1cc0e05a5, type: 3}

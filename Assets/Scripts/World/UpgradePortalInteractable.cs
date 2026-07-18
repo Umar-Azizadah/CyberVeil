@@ -17,6 +17,8 @@ namespace CyberVeil.World
         [Header("UI")]
         [SerializeField] private string portalName = "Upgrade Portal";
         [SerializeField] private string prompt = "Upgrade";
+        [SerializeField] private DialogueUI dialogueUI;
+        [SerializeField] private string incompleteWavesMessage = "Clear all corrupted";
         public string Prompt => prompt;
 
         private NameTag nameTag;
@@ -55,6 +57,24 @@ namespace CyberVeil.World
         /// </summary>
         private IEnumerator RunInteraction(IInteractor interactor)
         {
+            // Check if all waves are complete
+            WaveManager waveManager = FindObjectOfType<WaveManager>();
+            if (waveManager != null && !waveManager.AreAllWavesComplete())
+            {
+                // Show "Clear all corrupted" message
+                if (dialogueUI != null)
+                {
+                    dialogueUI.ShowLine(incompleteWavesMessage);
+                    yield return new WaitForSeconds(2.5f);
+                    dialogueUI.Hide();
+                }
+
+                var promptUI = FindObjectOfType<InteractPromptUI>(true);
+                if (promptUI) promptUI.gameObject.SetActive(true);
+
+                yield break;
+            }
+
             // Start a cinematic hold on the portal and keep it active while the upgrade menu is open
             bool holdStarted = false;
             if (CinematicCamera.Instance != null)
@@ -81,8 +101,8 @@ namespace CyberVeil.World
                 }
             }
 
-            var promptUI = FindObjectOfType<InteractPromptUI>(true);
-            if (promptUI) promptUI.gameObject.SetActive(true);
+            var promptUI2 = FindObjectOfType<InteractPromptUI>(true);
+            if (promptUI2) promptUI2.gameObject.SetActive(true);
 
             flow = null;
         }

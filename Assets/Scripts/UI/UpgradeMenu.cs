@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using CyberVeil.Systems;
 
 namespace CyberVeil.UI
 {
@@ -16,6 +17,16 @@ namespace CyberVeil.UI
         [Header("UI")]
         [SerializeField] private CanvasGroup canvasGroup;
         [SerializeField] private Button[] cardButtons; // Array holding references to the card buttons
+
+        [Header("Card Animation")]
+        [SerializeField] private bool animateOnShow = true;
+        [SerializeField] private float cardStaggerSeconds = 0.08f;
+        [SerializeField] private float cardStartScale = 0.85f;
+        [SerializeField] private float cardOvershootScale = 1.08f;
+        [SerializeField] private float cardPopSeconds = 0.18f;
+        [SerializeField] private float cardSettleSeconds = 0.12f;
+
+        private Coroutine cardsRoutine;
 
         public bool IsOpen { get; private set; } // Tells if menu is currently open 
         public int? PickedIndex { get; private set; } // Which card index was chosen
@@ -44,6 +55,12 @@ namespace CyberVeil.UI
                 if (hover == null)
                 {
                     btn.gameObject.AddComponent<PlaySoundOnHover>();
+                }
+
+                var cursorHover = btn.GetComponent<CursorChangeOnHover>();
+                if (cursorHover == null)
+                {
+                    btn.gameObject.AddComponent<CursorChangeOnHover>();
                 }
 
                 btn.onClick.RemoveAllListeners();
@@ -77,6 +94,13 @@ namespace CyberVeil.UI
             Time.timeScale = 0f;
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
+
+            if (animateOnShow)
+            {
+                if (cardsRoutine != null)
+                    StopCoroutine(cardsRoutine);
+                cardsRoutine = StartCoroutine(AnimateCardsIn());
+            }
         }
 
         /// <summary>
@@ -92,6 +116,12 @@ namespace CyberVeil.UI
             }
             gameObject.SetActive(false);
             IsOpen = false;
+
+            if (cardsRoutine != null)
+            {
+                StopCoroutine(cardsRoutine);
+                cardsRoutine = null;
+            }
         }
 
         /// <summary>
@@ -105,6 +135,57 @@ namespace CyberVeil.UI
             Cursor.lockState = CursorLockMode.Locked;
         }
 
+        private IEnumerator AnimateCardsIn()
+        {
+            if (cardButtons == null || cardButtons.Length == 0)
+                yield break;
+
+            for (int i = 0; i < cardButtons.Length; i++)
+            {
+                var btn = cardButtons[i];
+                if (btn == null) continue;
+
+                RectTransform rt = btn.transform as RectTransform;
+                if (rt == null) continue;
+
+                rt.localScale = Vector3.one * cardStartScale;
+            }
+
+            for (int i = 0; i < cardButtons.Length; i++)
+            {
+                var btn = cardButtons[i];
+                if (btn == null) continue;
+
+                RectTransform rt = btn.transform as RectTransform;
+                if (rt == null) continue;
+
+                yield return StartCoroutine(ScaleOverUnscaled(rt, cardStartScale, cardOvershootScale, cardPopSeconds));
+                yield return StartCoroutine(ScaleOverUnscaled(rt, cardOvershootScale, 1f, cardSettleSeconds));
+
+                if (cardStaggerSeconds > 0f)
+                    yield return new WaitForSecondsRealtime(cardStaggerSeconds);
+            }
+
+            cardsRoutine = null;
+        }
+
+        private static IEnumerator ScaleOverUnscaled(Transform target, float from, float to, float seconds)
+        {
+            float t = 0f;
+            float duration = Mathf.Max(0.0001f, seconds);
+            while (t < duration)
+            {
+                t += Time.unscaledDeltaTime;
+                float p = Mathf.Clamp01(t / duration);
+                float eased = Mathf.SmoothStep(0f, 1f, p);
+                float s = Mathf.LerpUnclamped(from, to, eased);
+                target.localScale = Vector3.one * s;
+                yield return null;
+            }
+
+            target.localScale = Vector3.one * to;
+        }
+
         /// <summary>
         /// Opens the menu and waits until the player clicks a card
         /// Returns when a card is picked; use PickedIndex to know which one
@@ -114,16 +195,35 @@ namespace CyberVeil.UI
             PickedIndex = null; //Reset picked index
             Show();
 
-            // Wait until a card is clicked
-            while (PickedIndex == null)
-                yield return null;
+            int bonusSlots = 0;
+            var curse = FindObjectOfType<TrialCurseModifier>();
+            if (curse != null)
+                bonusSlots = Mathf.Max(0, curse.GetRunBonusSlots());
 
-            // Apply a simple default upgrade mapping when a card is picked.
-            // This uses the PlayerStatsUpgradeManager to modify player stats and then
-            // notifies the WaveManager to continue after upgrade.
-            ApplyPickedUpgrade(PickedIndex.Value);
+            int picksRemaining = 1 + bonusSlots;
+
+            while (picksRemaining > 0)
+            {
+                // Wait until a card is clicked
+                while (PickedIndex == null)
+                    yield return null;
+
+                // Apply a simple default upgrade mapping when a card is picked.
+                ApplyPickedUpgrade(PickedIndex.Value);
+
+                picksRemaining--;
+                if (picksRemaining > 0)
+                    PickedIndex = null; // allow another pick without closing
+            }
 
             Hide(); // Hides after choice is made 
+
+            if (curse != null)
+                curse.ClearRunBonus();
+
+            // Notify wave manager to continue the run after upgrades (if present)
+            var wm = GameObject.FindObjectOfType<CyberVeil.Systems.WaveManager>();
+            wm?.ContinueAfterUpgrade();
         }
 
         // Simple, data-free mapping from card index to a sample upgrade effect.
@@ -146,10 +246,6 @@ namespace CyberVeil.UI
                     mods.AddMoveSpeed(0.5f);
                     break;
             }
-
-            // Notify wave manager to continue the run after upgrades (if present)
-            var wm = GameObject.FindObjectOfType<CyberVeil.Systems.WaveManager>();
-            wm?.ContinueAfterUpgrade();
         }
     }
 }

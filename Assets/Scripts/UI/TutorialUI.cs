@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using System.Collections;
+using System;
 
 namespace CyberVeil.UI
 {
@@ -10,10 +11,14 @@ namespace CyberVeil.UI
     /// </summary>
     public class TutorialUI : MonoBehaviour
     {
+        public static event Action OnTutorialComplete;
+
         [SerializeField] private TMP_Text tutorialText;
         [SerializeField] private CanvasGroup canvasGroup;
         [SerializeField] private float displayDuration = 2f; // How long each line shows
         [SerializeField] private float fadeDuration = 0.3f;  // Fade in/out duration
+        [SerializeField] private bool useTypewriter = true;
+        [SerializeField] private float charsPerSecond = 65f;
 
         private Coroutine tutorialCoroutine;
 
@@ -58,13 +63,11 @@ namespace CyberVeil.UI
             }
 
             gameObject.SetActive(false);
+            OnTutorialComplete?.Invoke();
         }
 
         private IEnumerator FadeInCoroutine(string text)
         {
-            if (tutorialText != null)
-                tutorialText.text = text;
-
             if (canvasGroup == null) yield break;
 
             float elapsedTime = 0f;
@@ -76,6 +79,12 @@ namespace CyberVeil.UI
             }
 
             canvasGroup.alpha = 1f;
+
+            // Apply typewriter animation after fade in
+            if (useTypewriter && tutorialText != null)
+                yield return TextTypewriterUtility.TypewriteText(tutorialText, text, charsPerSecond);
+            else if (tutorialText != null)
+                tutorialText.text = text;
         }
 
         private IEnumerator FadeOutCoroutine()
