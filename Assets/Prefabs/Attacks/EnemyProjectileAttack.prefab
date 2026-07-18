@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4282216622086119
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6178467940104791965}
+  - component: {fileID: 3735272406241448068}
+  m_Layer: 0
+  m_Name: EnemyProjectileAttack
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6178467940104791965
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4282216622086119}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.33251143, y: 4.0487537, z: 11.942993}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3735272406241448068
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4282216622086119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5188c9a094147ef4aa30682cad03cd6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  projectilePrefab: {fileID: 2624673084664009687, guid: 397a4977f46edc740a1d95b78a0f7371, type: 3}
+  muzzle: {fileID: 0}
+  spawnForwardOffset: 0.5
+  projectileSpeed: 18
+  projectileLifetime: 5
+  hitRadius: 1
+  damage: 18
+  particleType: 12
+  particleType2: 3
+  particleSpawnOffset: {x: 0, y: 0, z: 0}
+  playAudioOnStartAttack: 1
+  playAudioOnEndAttack: 0
+  playSecondParticle: 0
+  audioType: 37
+  audioType2: 38
+  audioVolume: 0.35
+  audioVolume2: 0.35
+  particleAndOrAudioPlayDelay: 0
+  particleAndOrAudioPlayDelay2: 0
+  telegraphSeconds: 0

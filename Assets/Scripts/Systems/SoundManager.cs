@@ -45,6 +45,8 @@ namespace CyberVeil.Systems
         VEYMARTALK,
         VEILSURGEACTIVATION,
         VEILSURGEACTIVE,
+        BATPROJECTILEBLAST,
+        BATAMBIENT1,
 
     }
 
@@ -302,6 +304,8 @@ namespace CyberVeil.Systems
             // Labels each entry with the correct name
             for (int i = 0; i < soundList.Length; i++)
             {
+                if (soundList[i] == null)
+                    soundList[i] = new SoundList();
                 soundList[i].name = names[i];
             }
         }
