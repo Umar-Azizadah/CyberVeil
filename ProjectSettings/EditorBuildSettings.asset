@@ -7,7 +7,7 @@ EditorBuildSettings:
   m_Scenes:
   - enabled: 1
     path: Assets/Scenes/CyberVeil_HomeScreen.unity
-    guid: 265c99b7f0af25043b348e2fdb876127
+    guid: f7af1fa22d3276b4e8808bd1b10c7504
   - enabled: 1
     path: Assets/Scenes/CyberVeil_Level1.unity
     guid: 724b2ef96630ea040a8a93535f4c9257
