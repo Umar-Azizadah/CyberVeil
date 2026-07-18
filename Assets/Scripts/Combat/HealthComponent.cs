@@ -99,6 +99,29 @@ namespace CyberVeil.Combat
             }
         }
 
+        public void HealPercent(float percent)
+        {
+            if (percent <= 0f)
+                return;
+
+            int amount = Mathf.CeilToInt(GetEffectiveMax() * percent);
+            Heal(amount);
+        }
+
+        public void Heal(int amount)
+        {
+            if (amount <= 0)
+                return;
+
+            int maxHealthValue = GetEffectiveMax();
+            int newHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealthValue);
+            if (newHealth == currentHealth)
+                return;
+
+            currentHealth = newHealth;
+            OnHealthChanged?.Invoke(this);
+        }
+
         private int GetEffectiveMax()
         {
             // Only the PLAYER gets the bonus; others use base maxHealth unchanged

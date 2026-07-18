@@ -19,6 +19,7 @@ namespace CyberVeil.Systems
 
         private Coroutine fadeCoroutine;
         private bool isFirstLoad = true;
+        private bool fadeFromBlackOnNextScene = false;
 
         private void Awake()
         {
@@ -73,6 +74,17 @@ namespace CyberVeil.Systems
         {
             // Find the BlackFade canvas in the new scene
             UpdateCanvasReference();
+
+            if (fadeFromBlackOnNextScene)
+            {
+                fadeFromBlackOnNextScene = false;
+                if (fadeCanvasGroup != null)
+                {
+                    fadeCanvasGroup.alpha = 1f;
+                    FadeFromBlack();
+                }
+                return;
+            }
 
             // On first load, fade out from black for startup
             if (isFirstLoad)
@@ -154,6 +166,14 @@ namespace CyberVeil.Systems
                 StopCoroutine(fadeCoroutine);
 
             fadeCoroutine = StartCoroutine(FadeFromBlackCoroutine());
+        }
+
+        /// <summary>
+        /// Ensures the next scene load fades from black on arrival.
+        /// </summary>
+        public void RequestFadeFromBlackOnNextScene()
+        {
+            fadeFromBlackOnNextScene = true;
         }
 
         private IEnumerator FadeToBlackCoroutine(System.Action onComplete = null)
