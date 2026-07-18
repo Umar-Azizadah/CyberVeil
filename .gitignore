@@ -33,6 +33,7 @@ Thumbs.db
 # Unity builds
 GameBuild/
 NewGameBuild/
+MacGameBuild.app/
 # Unity/VS generated
 Library/
 Logs/
