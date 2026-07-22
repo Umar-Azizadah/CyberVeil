@@ -1,6 +1,3 @@
-<p align="center">
-  <img src="Assets/Art/UI/CyberVeilTitle.png" alt="CyberVeil" width="720">
-</p>
 
 <p align="center">
   A cyber-medieval third-person action game built with Unity.
