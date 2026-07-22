@@ -1,6 +1,6 @@
 
 <p align="center">
-  A cyber-medieval third-person action game built with Unity.
+  A cyber-medieval third-person hack-and-slash game built with Unity.
 </p>
 
 ![CyberVeil](Assets/Art/UI/CyberVeilMainMenu.png)
@@ -9,7 +9,7 @@
 
 CyberVeil is a stylized action game set in a fractured cyber-medieval world. Fight through enemy waves, adapt to trial curses, cleanse the portal, choose upgrades, and push through three increasingly dangerous levels.
 
-The game combines fast melee combat with a low-poly fantasy world, neon corruption, magical technology, cinematic transitions, and a shard-based archive home screen.
+The game combines fast melee combat with a fantasy world, neon corruption, and futuristic technology.
 
 ## Why I Made It
 
@@ -18,6 +18,25 @@ About a year ago, I wanted to start my first coding project. Making a game sound
 What started as a first project became something I put a lot of passion into. Along the way, I learned far more than how to write individual scripts: I learned how to organize a growing codebase, separate responsibilities, debug interactions between systems, work with state and events, iterate on game feel, and make technical decisions without losing sight of the player experience.
 
 CyberVeil is still evolving, but it represents a year of learning, experimentation, and care.
+
+## Project Structure
+
+```text
+Assets/
+|-- Art/                    Models, materials, animations, shaders, and UI art
+|-- Audio/                  Music and sound effects
+|-- Scenes/                 Home screen and playable levels
+`-- Scripts/
+    |-- Audio/              Audio feedback components
+    |-- Combat/             Damage, health, knockback, and combat coordination
+    |-- Core/               Shared interfaces and character state infrastructure
+    |-- Enemies/            Enemy AI, attacks, and damage responses
+    |-- Player Scripts/     Movement, attacks, abilities, and player progression
+    |-- Systems/            Waves, curses, scene flow, cameras, audio, and feedback
+    |-- UI/                 Menus, tutorials, dialogue, HUD, and shard archive
+    |-- VFX/                Dissolves, particles, and hit effects
+    `-- World/              NPCs, crystals, portals, and interaction components
+```
 
 ## Features
 
@@ -76,25 +95,6 @@ The enabled build sequence is:
 2. `CyberVeil_Level1`
 3. `CyberVeil_Level2`
 4. `CyberVeil_Level3`
-
-## Project Structure
-
-```text
-Assets/
-|-- Art/                    Models, materials, animations, shaders, and UI art
-|-- Audio/                  Music and sound effects
-|-- Scenes/                 Home screen and playable levels
-`-- Scripts/
-    |-- Audio/              Audio feedback components
-    |-- Combat/             Damage, health, knockback, and combat coordination
-    |-- Core/               Shared interfaces and character state infrastructure
-    |-- Enemies/            Enemy AI, attacks, and damage responses
-    |-- Player Scripts/     Movement, attacks, abilities, and player progression
-    |-- Systems/            Waves, curses, scene flow, cameras, audio, and feedback
-    |-- UI/                 Menus, tutorials, dialogue, HUD, and shard archive
-    |-- VFX/                Dissolves, particles, and hit effects
-    `-- World/              NPCs, crystals, portals, and interaction components
-```
 
 ## Technical Highlights
 
